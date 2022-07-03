@@ -1,5 +1,6 @@
 import UmamiClient from '../src/UmamiClient.js';
 
+import { strict as assert } from 'assert';
 import chai from 'chai';
 const should = chai.should;
 const expect = chai.expect;
@@ -11,7 +12,7 @@ var authData = null;
 var sitesData = null;
 var siteData = null;
 
-describe("Test UmamiClient success cases", function() {
+describe("Test UmamiClient env based cases", function() {
   before(function () {
     if (!isSet(process.env.UMAMI_SERVER)) {
       console.log("skip without UMAMI_SERVER, you must setup your env to play success cases")
@@ -19,7 +20,7 @@ describe("Test UmamiClient success cases", function() {
     }
     client = new UmamiClient();
     if (TEST_VERBOSE) {
-      console.info("Test agains umami server: "+process.env.UMAMI_SERVER);
+      console.info("Test against umami server: "+process.env.UMAMI_SERVER);
     }
   });
 
@@ -31,6 +32,14 @@ describe("Test UmamiClient success cases", function() {
     authData = await client.login(process.env.UMAMI_USER, process.env.UMAMI_PASSWORD).catch(_expectNoError);
     authData.should.not.be.empty;
     authData.token.should.not.be.empty;
+  });
+
+  it("should not login" , async function() {
+    try {
+      await client.login("admin","hack!Me");
+    } catch(error) {
+      assert.equal(error, `401 - Login failed - 401 Unauthorized`);
+    }
   });
 
   it("should get sites" , async function() {
