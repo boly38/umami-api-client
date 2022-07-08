@@ -76,7 +76,7 @@ You're not a dev ? just submit an issue (bug, improvements, questions). Or else:
 git clone https://github.com/boly38/umami-api-client.git
 cd umami-api-client
 npm install
-# play test without etsy endpoint
+# play test without umami endpoint
 npm run test
 # play test with umami endpoint
 . ./env/initenv.dontpush.sh
