@@ -43,10 +43,7 @@ describe("Test UmamiClient env based cases", function() {
   });
 
   it("should get sites" , async function() {
-    if (!isSet(authData) || !isSet(authData.token)) {
-      console.log("skip without authData")
-      this.skip();
-    }
+    expectAuthData();
     sitesData = await client.getSites(authData).catch(_expectNoError);
     if (!isSet(sitesData) || sitesData.length < 1) {
       console.info(" x none");
@@ -59,10 +56,7 @@ describe("Test UmamiClient env based cases", function() {
   });
 
   it("should get sites by domain" , async function() {
-    if (!isSet(sitesData)) {
-      console.log("skip without sitesData")
-      this.skip();
-    }
+    expectSitesData();
     siteData = client.selectSiteByDomain(sitesData, sitesData[0].domain);
     if (!isSet(siteData) && TEST_VERBOSE) {
       console.info(" x none");
@@ -74,24 +68,64 @@ describe("Test UmamiClient env based cases", function() {
     expect(siteData).to.be.eql(client.selectSiteByDomain(sitesData, '*first*'));
   });
 
-  it("should get site stats" , async function() {
-    if (!isSet(authData) || !isSet(authData.token)) {
-      console.log("skip without authData")
-      this.skip();
-    }
-    if (!isSet(siteData)) {
-      console.log("skip without siteData")
-      this.skip();
-    }
-    var siteStats = await client.getStatsForLast24h(authData, siteData);
-    if (!isSet(siteStats) && TEST_VERBOSE) {
-      console.info(" x none");
-    } else if (TEST_VERBOSE){
-      console.info(" * "+ siteData.domain + " stats:\n"+ JSON.stringify(siteStats));
-    }
-    siteStats.should.not.be.empty;
+  it("should GET /api/website/{id}/stats" , async function() {
+    expectAuthAndSiteData();
+    var siteDataResult = await client.getStatsForLast24h(authData, siteData);
+    assumeNotEmptyListResult('stats', siteDataResult);
+  });
+
+  it("should GET /api/website/{id}/pageviews" , async function() {
+    expectAuthAndSiteData();
+    var siteDataResult = await client.getPageViewsForLast24h(authData, siteData);
+    assumeNotEmptyListResult('pageviews', siteDataResult);
+  });
+
+  it("should GET /api/website/{id}/events" , async function() {
+    expectAuthAndSiteData();
+    var siteDataResult = await client.getEventsForLast24h(authData, siteData);
+    assumeNotEmptyListResult('events', siteDataResult);
+  });
+
+  // all types are : ['url', 'referrer', 'browser', 'os', 'device', 'country', 'event']
+  it("should GET /api/website/{id}/metrics" , async function() {
+    expectAuthAndSiteData();
+    for (const type of ['url', 'referrer']) {
+      var siteDataResult = await client.getMetricsForLast24h(authData, siteData, {type});
+      assumeNotEmptyListResult(`metrics type:${type}`, siteDataResult);
+    };
+
   });
 });
 
 const isSet = (value) => value !== null && value !== undefined;
 const _expectNoError = (err) => expect.fail(err);
+const expectAuthData = () => {
+  if (!isSet(authData) || !isSet(authData.token)) {
+    console.log("skip without authData")
+    this.skip();
+  }
+}
+const expectSitesData = () => {
+  if (!isSet(sitesData)) {
+    console.log("skip without sitesData")
+    this.skip();
+  }
+}
+const expectSiteData = () => {
+  if (!isSet(siteData)) {
+    console.log("skip without siteData")
+    this.skip();
+  }
+}
+const expectAuthAndSiteData = () => {
+  expectAuthData();
+  expectSiteData();
+}
+const assumeNotEmptyListResult = (description, siteResultList) => {
+  if (!isSet(siteResultList) && TEST_VERBOSE) {
+    console.info(" x none");
+  } else if (TEST_VERBOSE){
+    console.info(` * ${siteData.domain} ${description}: ${JSON.stringify(siteResultList)}`);
+  }
+  siteResultList.should.not.be.empty;
+}

@@ -12,7 +12,7 @@ Features
 using apiKey:
 - login
 - getSites
-- getStatsForLast24h
+- getStatsForLast24h, getPageViewsForLast24h, getEventsForLast24h, getMetricsForLast24h
 
 # Quick start
 
