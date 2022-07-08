@@ -73,7 +73,7 @@ jobs:
         npm publish
 
     - name: "Deploy Github Pages (code-coverage)"
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/npmjs'
       uses: JamesIves/github-pages-deploy-action@v4.2.5
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
