@@ -68,12 +68,12 @@ class UmamiClient {
   }
 
   // GET /api/website/{id}/pageviews
-  async getPageViewsForLast24h(authData, siteData, options = {unit:'day', tz: 'Europe/Paris'}) {
+  async getPageViewsForLast24h(authData, siteData, options = {unit:'hour', tz: 'Europe/Paris'}) {
     return await this.getWebSiteDataForAPeriod(authData, siteData, 'page views', '/pageviews', '24h', options);
   }
 
   // GET /api/website/{id}/events
-  async getEventsForLast24h(authData, siteData, options = {unit:'day', tz: 'Europe/Paris'}) {
+  async getEventsForLast24h(authData, siteData, options = {unit:'hour', tz: 'Europe/Paris'}) {
     return await this.getWebSiteDataForAPeriod(authData, siteData, 'page events', '/events', '24h', options);
   }
 
