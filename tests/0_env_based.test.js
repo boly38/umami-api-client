@@ -139,7 +139,7 @@ describe("Test UmamiClient env based cases", function() {
     expectAuthAndSiteData();
     for (const type of ['url', 'referrer']) {
       var result = await client.getMetricsForLast24h(authData, siteData, {type});
-      assumeListResult(`24h metrics type:${type}`, result);
+      assumeListResult(`24h metrics type:${type}`, result, true);
     };
   });
 
@@ -189,7 +189,7 @@ const assumeObjectResult = (description, siteResult) => {
     console.info(` * ${siteData.domain} ${description}:\n${JSON.stringify(siteResult)}`);
   }
 }
-const assumeListResult = (description, siteResultList) => {
+const assumeListResult = (description, siteResultList, mayBeEmpty = false) => {
   if (!isSet(siteResultList) ) {
     expect.fail(`expect list ${description} to be set`);
   } else if (siteResultList.length === 0 && TEST_VERBOSE) {
@@ -199,5 +199,7 @@ const assumeListResult = (description, siteResultList) => {
   } else {
     console.info(` * ${siteData.domain} ${description}:\t${siteResultList.length} result(s)`);
   }
-  siteResultList.should.not.be.empty;
+  if (!mayBeEmpty) {
+    siteResultList.should.not.be.empty;
+  }
 }
