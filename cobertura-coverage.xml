@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-04.dtd">
-<coverage lines-valid="172" lines-covered="170" line-rate="0.9883" branches-valid="61" branches-covered="55" branch-rate="0.9016" timestamp="1657804515419" complexity="0" version="0.1">
+<coverage lines-valid="172" lines-covered="170" line-rate="0.9883" branches-valid="61" branches-covered="55" branch-rate="0.9016" timestamp="1661021908968" complexity="0" version="0.1">
   <sources>
     <source>/home/runner/work/umami-api-client/umami-api-client</source>
   </sources>
