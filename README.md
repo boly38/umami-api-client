@@ -6,6 +6,8 @@ Umami [ReST API](https://umami.is/docs/api).
 
 - compatible with JavaScript.
 
+Please note that a more efficient and typescript compatible API now exists: cf. https://github.com/jakobbouchard/umami-api-client
+
 ## UmamiClient
 Features
 
