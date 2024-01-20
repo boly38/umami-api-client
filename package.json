@@ -1,6 +1,6 @@
 {
   "name": "umami-api-client",
-  "version": "0.0.4",
+  "version": "2.0.9",
   "description": "Umami API nodeJS client",
   "main": "./lib/export.js",
   "type": "module",
