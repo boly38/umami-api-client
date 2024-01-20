@@ -1,24 +1,23 @@
 import UmamiClient from '../src/UmamiClient.js';
 
 import { strict as assert } from 'assert';
-import chai from 'chai';
-const should = chai.should;
-const expect = chai.expect;
+import { expect, should } from 'chai';
+should();
 
-var testClient = new UmamiClient({server:'https://fake.umami.exemple.com'})
+const testClient = new UmamiClient({server:'https://fake.umami.exemple.com'})
 
-const validSiteData = {website_id:0, website_uuid: 'uuu44-4444-6666', name: 'test-site-data', domain:'www.example.com', created_at:'2022-02-17T12:57:43.805Z'};
+const validSiteData = {id:'uuu44-4444-6666', name: 'test-site-data', domain:'www.example.com', createdAt:'2022-02-17T12:57:43.805Z'};
 
 describe("Test UmamiClient negative cases", function() {
   before(function () {
     delete process.env.UMAMI_SERVER;
   });
 
-  it("UmamiClient should not work without server" , async function() {
+  it("UmamiClient should not work without server" , async () => {
       expect(function () { new UmamiClient(); } ).to.throw("server is required. ie. set UMAMI_SERVER environment variable or option.");
   });
 
-  it("getSites should not work without authData" , async function() {
+  it("getSites should not work without authData" , async () => {
       try {
         await testClient.getSites({})
       } catch(error) {
@@ -26,15 +25,15 @@ describe("Test UmamiClient negative cases", function() {
       }
   });
 
-  it("selectSiteByDomain should not work without siteDatas" , async function() {
+  it("selectSiteByDomain should not work without siteDatas" , async () => {
       expect(function () { testClient.selectSiteByDomain([]) } ).to.throw("No sites data provided");
   });
 
-  it("selectSiteByDomain should not work without valid siteDatas" , async function() {
+  it("selectSiteByDomain should not work without valid siteDatas" , async () => {
       expect(function () { testClient.selectSiteByDomain([{}]) } ).to.throw("Unexpected sites data provided");
   });
 
-  it("getStats should not work without valid period" , async function() {
+  it("getStats should not work without valid period" , async () => {
       try {
         await testClient.getStats({token:'fake'}, validSiteData, 'SEVEN DAYS');
       } catch(error) {
@@ -45,7 +44,7 @@ describe("Test UmamiClient negative cases", function() {
       }
   });
 
-  it("getStats should not work without valid siteData" , async function() {
+  it("getStats should not work without valid siteData" , async () => {
       try {
         await testClient.getStats({token:'fake'}, {});
       } catch(error) {
@@ -53,7 +52,7 @@ describe("Test UmamiClient negative cases", function() {
       }
   });
 
-  it("getPageViews should not work without valid siteData" , async function() {
+  it("getPageViews should not work without valid siteData" , async () => {
       try {
         await testClient.getStats({token:'fake'}, {});
       } catch(error) {
@@ -61,7 +60,7 @@ describe("Test UmamiClient negative cases", function() {
       }
   });
 
-  it("getEvents should not work without valid siteData" , async function() {
+  it("getEvents should not work without valid siteData" , async () => {
       try {
         await testClient.getEvents({token:'fake'}, {});
       } catch(error) {
@@ -69,7 +68,7 @@ describe("Test UmamiClient negative cases", function() {
       }
   });
 
-  it("getMetrics should not work without valid siteData" , async function() {
+  it("getMetrics should not work without valid siteData" , async () => {
       try {
         await testClient.getMetrics({token:'fake'}, {});
       } catch(error) {
