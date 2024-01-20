@@ -13,7 +13,7 @@ class UmamiClient {
   constructor(options = {}) {
     this.server = "server" in options ? options.server : (process.env.UMAMI_SERVER ? process.env.UMAMI_SERVER : null);
     this._assumeUmamiServer();
-    UMAMI_CLIENT_DEBUG && console.debug(`UmamiClient - server:${this.apiUrl}`);
+    UMAMI_CLIENT_DEBUG && console.debug(`UmamiClient - server:${this.server}`);
   }
 
   async login(username = process.env.UMAMI_USER, password = process.env.UMAMI_PASSWORD) {
@@ -34,7 +34,7 @@ class UmamiClient {
     await assumeResponseSuccess(getSitesResponse, "Unable to get sites");
     const sitesData = await getSitesResponse.json();
     UMAMI_CLIENT_DEBUG_RESPONSE && console.log(sitesData);
-    return sitesData;
+    return sitesData.data;
   }
 
   selectSiteByDomain(sitesData, siteDomain = '*first*') {
@@ -53,7 +53,7 @@ class UmamiClient {
   async getWebSiteDataForAPeriod(authData, siteData, dataDescription = 'stats', dataPath = '/stats', period = '24h', options = {}) {
     givenAuthAndSiteData(authData, siteData);
     const queryOptions = enrichOptionsWithPeriod(options, period);
-    const siteDataUrl = this.server+ `/api/website/${siteData.website_id}${dataPath}?` + queryString.stringify(queryOptions);
+    const siteDataUrl = this.server+ `/api/websites/${siteData.id}${dataPath}?` + queryString.stringify(queryOptions);
     UMAMI_CLIENT_DEBUG_REQUEST && console.log(`url:${siteDataUrl}`);
     const getDataResponse = await fetch(siteDataUrl, { headers: { "Authorization": `Bearer ${authData.token}`} }).catch(rethrow);
     await assumeResponseSuccess(getDataResponse, `Unable to get site ${dataDescription}`);
@@ -116,7 +116,7 @@ class UmamiClient {
 export default UmamiClient;
 
 //~ private
-const EXPECTED_SITE_DATA_KEYS = ['website_id', 'website_uuid', 'name', 'domain', 'created_at'];
+const EXPECTED_SITE_DATA_KEYS = ['id', 'name', 'domain', 'createdAt'];
 const isObject = (a) => (!!a) && (a.constructor === Object);
 const isSet = (value) => value !== null && value !== undefined;
 const isNotEmptyArray = (value) => isSet(value) && Array.isArray(value) && value.length > 0;
@@ -148,9 +148,9 @@ const MONTH_PERIODS = ['31d','31days','1m','1month'];
 const THIRTY_DAYS_PERIODS = ['30d','30days'];
 const ACCEPTED_PERIODS = [...HOUR_PERIODS, ...DAY_PERIODS, ...WEEK_PERIODS, ...MONTH_PERIODS, ...THIRTY_DAYS_PERIODS];
 const buildPeriodOptions = (options, diffMs) => {
-  const start_at = Date.now() + diffMs;
-  const end_at = Date.now();
-  options = { ...options, start_at, end_at };
+  const startAt = Date.now() + diffMs;
+  const endAt = Date.now();
+  options = { ...options, startAt, endAt };
   return options;
 }
 const enrichOptionsWithPeriod = (options = {}, period = '24h') => {

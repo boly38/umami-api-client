@@ -1,16 +1,14 @@
 import UmamiClient from '../src/UmamiClient.js';
 
 import { strict as assert } from 'assert';
-import chai from 'chai';
-const should = chai.should;
-const expect = chai.expect;
-chai.should();
+import { expect, should } from 'chai';
+should();
 
 const TEST_VERBOSE = process.env.TEST_VERBOSE === 'true'
-var client;
-var authData = null;
-var sitesData = null;
-var siteData = null;
+let client;
+let authData = null;
+let sitesData = null;
+let siteData = null;
 
 describe("Test UmamiClient env based cases", function() {
   before(function () {
@@ -40,7 +38,7 @@ describe("Test UmamiClient env based cases", function() {
     try {
       await client.login("admin","hack!Me");
     } catch(error) {
-      assert.equal(error, `401 - Login failed - 401 Unauthorized`);
+      assert.equal(error, `401 - Login failed - message.incorrect-username-password`);
     }
   });
 
@@ -51,8 +49,8 @@ describe("Test UmamiClient env based cases", function() {
       console.info(" x none");
     } else if (TEST_VERBOSE) {
       sitesData.forEach(siteData => {
-        console.info(" * #"+ siteData.website_uuid + " created_at:"+ siteData.created_at + " - name:"+ siteData.name + " domain:" + siteData.domain);
-      })
+        console.info(" * #"+ siteData.id + " created_at:"+ siteData.createdAt + " - name:"+ siteData.name + " domain:" + siteData.domain);
+      });
     }
     sitesData.should.not.be.empty;
   });
@@ -63,7 +61,7 @@ describe("Test UmamiClient env based cases", function() {
     if (!isSet(siteData) && TEST_VERBOSE) {
       console.info(" x none");
     } else if (TEST_VERBOSE){
-      console.info(" * #"+ siteData.website_uuid + " created_at:"+ siteData.created_at + " - name:"+ siteData.name + " domain:" + siteData.domain);
+      console.info(" * #"+ siteData.id + " created_at:"+ siteData.createdAt + " - name:"+ siteData.name + " domain:" + siteData.domain);
     }
     siteData.should.not.be.empty;
     expect(siteData).to.be.eql(client.selectSiteByDomain(sitesData)); // return first by default
@@ -76,7 +74,7 @@ describe("Test UmamiClient env based cases", function() {
 
   it("should GET /api/website/{id}/stats for 1h" , async function() {
     expectAuthAndSiteData();
-    var result = await client.getStats(authData, siteData, '1h');
+    const result = await client.getStats(authData, siteData, '1h');
     assumeObjectResult('stats 1 hour', result);
   });
 
@@ -162,7 +160,7 @@ const isSet = (value) => value !== null && value !== undefined;
 const _expectNoError = (err) => expect.fail(err);
 const expectAuthData = () => {
   if (!isSet(authData) || !isSet(authData.token)) {
-    console.log("skip without authData")
+    console.log("skip without authData");
     this.skip();
   }
 }
@@ -174,7 +172,7 @@ const expectSitesData = () => {
 }
 const expectSiteData = () => {
   if (!isSet(siteData)) {
-    console.log("skip without siteData")
+    console.log("skip without siteData");
     this.skip();
   }
 }
