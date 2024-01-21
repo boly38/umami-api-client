@@ -111,5 +111,8 @@ dist
 __*/
 *.dontpush.*
 
+# .http creds
+*.private.env.json
+
 # npm creds
 .npmrc

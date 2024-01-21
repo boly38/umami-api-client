@@ -1,0 +1,20 @@
+### LIST websites (and select FIRST one)
+GET {{url}}/api/websites
+Authorization: Bearer {{user-token}}
+
+> {%
+    import {verifyReturnCode, listSetWebsiteId} from "common.js";
+    verifyReturnCode(client, response, 200);
+    listSetWebsiteId(client, response)
+%}
+
+### GET current_website_id
+GET {{url}}/api/websites/{{current_website_id}}
+Authorization: Bearer {{user-token}}
+
+### reset and GET current_website_id
+< {%
+    client.global.set("current_website_id", "111_222_aaa_fff_ccc");
+%}
+GET {{url}}/api/websites/{{current_website_id}}
+Authorization: Bearer {{user-token}}
