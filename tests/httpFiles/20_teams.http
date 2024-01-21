@@ -1,0 +1,8 @@
+### GET users
+GET {{url}}/api/teams
+Authorization: Bearer {{user-token}}
+
+> {%
+    import {verifyReturnCode} from "common.js";
+    verifyReturnCode(client, response, 200);
+%}

@@ -1,0 +1,20 @@
+### GET current_website_id /active
+GET {{url}}/api/websites/{{current_website_id}}/active
+Authorization: Bearer {{user-token}}
+#  unique visitors within the last 5 minutes
+
+### GET current_website_id /events
+GET {{url}}/api/websites/{{current_website_id}}/events?startAt={{startAt}}&endAt={{endAt}}&unit=hour&tz={{tz}}
+Authorization: Bearer {{user-token}}
+
+### GET current_website_id /pageviews
+GET {{url}}/api/websites/{{current_website_id}}/pageviews?startAt={{startAt}}&endAt={{endAt}}&unit=hour&tz={{tz}}
+Authorization: Bearer {{user-token}}
+
+### GET current_website_id /metrics
+GET {{url}}/api/websites/{{current_website_id}}/metrics?startAt={{startAt}}&endAt={{endAt}}&type={{metric_type}}
+Authorization: Bearer {{user-token}}
+
+### GET current_website_id /stats
+GET {{url}}/api/websites/{{current_website_id}}/stats?startAt={{startAt}}&endAt={{endAt}}
+Authorization: Bearer {{user-token}}
