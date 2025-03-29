@@ -100,11 +100,11 @@ class UmamiClient {
     /*
      * @deprecated : please use getPageViews(...)
      */
-    async getPageViewsForLast24h(authData, siteData, options = {unit: 'hour', tz: 'Europe/Paris'}) {
+    async getPageViewsForLast24h(authData, siteData, options = {unit: 'hour', timezone: 'Europe/Paris'}) {
         return await this.getPageViews(authData, siteData, options, '24h');
     }
 
-    async getPageViews(authData, siteData, options = {unit: 'hour', tz: 'Europe/Paris'}, period = '24h') {
+    async getPageViews(authData, siteData, options = {unit: 'hour', timezone: 'Europe/Paris'}, period = '24h') {
         return await this.getWebSiteDataForAPeriod(authData, siteData, 'page views', '/pageviews', period, options);
     }
 
@@ -112,11 +112,11 @@ class UmamiClient {
     /*
      * @deprecated : please use getEvents(...)
      */
-    async getEventsForLast24h(authData, siteData, options = {unit: 'hour', tz: 'Europe/Paris'}) {
+    async getEventsForLast24h(authData, siteData, options = {unit: 'hour', timezone: 'Europe/Paris'}) {
         return await this.getEvents(authData, siteData, options);
     }
 
-    async getEvents(authData, siteData, options = {unit: 'hour', tz: 'Europe/Paris'}, period = '24h') {
+    async getEvents(authData, siteData, options = {unit: 'hour', timezone: 'Europe/Paris'}, period = '24h') {
         return await this.getWebSiteDataForAPeriod(authData, siteData, 'page events', '/events', period, options);
     }
 
