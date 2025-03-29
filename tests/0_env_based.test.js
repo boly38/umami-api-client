@@ -7,8 +7,12 @@ import { env } from 'node:process';
 should();
 
 /** environment variables **/
-let { UMAMI_TEST_VERBOSE } = env;
-UMAMI_TEST_VERBOSE = UMAMI_TEST_VERBOSE === 'true';
+const {
+    UMAMI_TEST_VERBOSE,
+    UMAMI_SERVER,
+    UMAMI_USER, UMAMI_PASSWORD,
+    UMAMI_SITE_DOMAIN} = env;
+const verbose = UMAMI_TEST_VERBOSE === 'true';
 
 let client;
 let authData = null;
@@ -16,25 +20,25 @@ let sitesData = null;
 let siteData = null;
 
 describe("Test UmamiClient env based cases", () => {
-    before(function () {
-        if (!isSet(process.env.UMAMI_SERVER)) {
+    before( () =>{
+        if (!isSet(UMAMI_SERVER)) {
             console.log("skip without UMAMI_SERVER, you must setup your env to play success cases");
             this.skip();
         }
         client = new UmamiClient();
-        if (UMAMI_TEST_VERBOSE) {
-            console.info("Test against umami server: " + process.env.UMAMI_SERVER);
+        if (verbose) {
+            console.info(`Test against umami server: ${UMAMI_SERVER}`);
         } else {
             console.info("You could switch to verbose mode by setting UMAMI_TEST_VERBOSE=true, and/or UMAMI_CLIENT_DEBUG_REQUEST UMAMI_CLIENT_DEBUG_RESPONSE");
         }
     });
 
     it("should login", async () => {
-        if (!isSet(process.env.UMAMI_USER) || !isSet(process.env.UMAMI_PASSWORD)) {
+        if (!isSet(UMAMI_USER) || !isSet(UMAMI_PASSWORD)) {
             console.log("skip without UMAMI_USER, UMAMI_PASSWORD");
             this.skip();
         }
-        authData = await client.login(process.env.UMAMI_USER, process.env.UMAMI_PASSWORD).catch(_expectNoError);
+        authData = await client.login(UMAMI_USER, UMAMI_PASSWORD).catch(_expectNoError);
         authData.should.not.be.empty;
         authData.token.should.not.be.empty;
     });
@@ -43,7 +47,7 @@ describe("Test UmamiClient env based cases", () => {
         try {
             await client.login("admin", "hack!Me");
         } catch (error) {
-            assert.equal(error, `401 - Login failed - message.incorrect-username-password`);
+            assert.equal(error, `401 - Login failed - {"error":"message.incorrect-username-password"}`);
         }
     });
 
@@ -52,9 +56,9 @@ describe("Test UmamiClient env based cases", () => {
         sitesData = await client.getSites(authData).catch(_expectNoError);
         if (!isSet(sitesData) || sitesData.length < 1) {
             console.info(" x none");
-        } else if (UMAMI_TEST_VERBOSE) {
+        } else if (verbose) {
             sitesData.forEach(siteData => {
-                console.info(" * #" + siteData.id + " created_at:" + siteData.createdAt + " - name:" + siteData.name + " domain:" + siteData.domain);
+                console.info(` * #${siteData.id} created_at:${siteData.createdAt} - name:${siteData.name} domain:${siteData.domain}`);
             });
         }
         sitesData.should.not.be.empty;
@@ -63,17 +67,17 @@ describe("Test UmamiClient env based cases", () => {
     it("should get sites by domain", async () => {
         expectSitesData();
         siteData = client.selectSiteByDomain(sitesData, sitesData[0].domain);
-        if (!isSet(siteData) && UMAMI_TEST_VERBOSE) {
+        if (!isSet(siteData) && verbose) {
             console.info(" x none");
-        } else if (UMAMI_TEST_VERBOSE) {
+        } else if (verbose) {
             console.info(" * #" + siteData.id + " created_at:" + siteData.createdAt + " - name:" + siteData.name + " domain:" + siteData.domain);
         }
         siteData.should.not.be.empty;
         expect(siteData).to.be.eql(client.selectSiteByDomain(sitesData)); // return first by default
         expect(siteData).to.be.eql(client.selectSiteByDomain(sitesData, '*first*'));
-        if (process.env.UMAMI_SITE_DOMAIN) {
-            siteData = client.selectSiteByDomain(sitesData, process.env.UMAMI_SITE_DOMAIN);
-            siteData.should.not.be.empty;
+        if (UMAMI_SITE_DOMAIN) {
+            siteData = client.selectSiteByDomain(sitesData, UMAMI_SITE_DOMAIN);
+            expect(siteData, `no site data for domain UMAMI_SITE_DOMAIN:${UMAMI_SITE_DOMAIN}`).to.not.be.empty;
         }
     });
 
@@ -115,7 +119,7 @@ describe("Test UmamiClient env based cases", () => {
 
     it("should GET /api/website/{id}/pageviews for 7 days", async () => {
         expectAuthAndSiteData();
-        const result = await client.getPageViews(authData, siteData, {unit: 'day', tz: 'Europe/Paris'}, '7d');
+        const result = await client.getPageViews(authData, siteData, {unit: 'day', timezone: 'Europe/Paris'}, '7d');
         assumeObjectResult('pageviews 7 days', result);
     });
 
@@ -127,13 +131,13 @@ describe("Test UmamiClient env based cases", () => {
 
     it("should GET /api/website/{id}/events for 7 days", async () => {
         expectAuthAndSiteData();
-        const result = await client.getEvents(authData, siteData, {unit: 'day', tz: 'Europe/Paris'}, '7d');
+        const result = await client.getEvents(authData, siteData, {unit: 'day', timezone: 'Europe/Paris'}, '7d');
         assumeListResult('events 7 days', result);
     });
 
     it("should GET /api/website/{id}/events for 30 days", async () => {
         expectAuthAndSiteData();
-        const result = await client.getEvents(authData, siteData, {unit: 'day', tz: 'Europe/Paris'}, '30d');
+        const result = await client.getEvents(authData, siteData, {unit: 'day', timezone: 'Europe/Paris'}, '30d');
         assumeListResult('events 30 days', result);
     });
 
@@ -164,7 +168,7 @@ describe("Test UmamiClient env based cases", () => {
 const isSet = (value) => value !== null && value !== undefined;
 const _expectNoError = (err) => expect.fail(err);
 const expectAuthData = () => {
-    if (!isSet(authData) || !isSet(authData.token)) {
+    if (!isSet(authData?.token)) {
         console.log("skip without authData");
         this.skip();
     }
@@ -188,16 +192,16 @@ const expectAuthAndSiteData = () => {
 const assumeObjectResult = (description, siteResult) => {
     if (!isSet(siteResult)) {
         expect.fail(`expect ${description} to be set`);
-    } else if (UMAMI_TEST_VERBOSE) {
+    } else if (verbose) {
         console.info(` * ${siteData.domain} ${description}:\n${JSON.stringify(siteResult)}`);
     }
 };
 const assumeListResult = (description, siteResultList, mayBeEmpty = false) => {
     if (!isSet(siteResultList)) {
         expect.fail(`expect list ${description} to be set`);
-    } else if (siteResultList.length === 0 && UMAMI_TEST_VERBOSE) {
+    } else if (siteResultList.length === 0 && verbose) {
         console.info(" x none");
-    } else if (UMAMI_TEST_VERBOSE) {
+    } else if (verbose) {
         console.info(` * ${siteData.domain} ${description}:\n${JSON.stringify(siteResultList)}`);
     } else {
         console.info(` * ${siteData.domain} ${description}:\t${siteResultList.length} result(s)`);
