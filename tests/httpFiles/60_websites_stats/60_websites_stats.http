@@ -1,0 +1,21 @@
+### As admin GET current_website_id /active
+GET {{url}}/api/websites/{{current_website_id}}/active
+Authorization: Bearer {{admin-token}}
+#  unique visitors within the last 5 minutes
+
+
+### As admin GET current_website_id /events/series
+GET {{url}}/api/websites/{{current_website_id}}/events?startAt={{startAt}}&endAt={{endAt}}&unit=hour&timezone={{tz}}
+Authorization: Bearer {{admin-token}}
+
+### As admin GET current_website_id /pageviews
+GET {{url}}/api/websites/{{current_website_id}}/pageviews?startAt={{startAt}}&endAt={{endAt}}&unit=hour&timezone={{tz}}
+Authorization: Bearer {{admin-token}}
+
+### As admin GET current_website_id /metrics
+GET {{url}}/api/websites/{{current_website_id}}/metrics?startAt={{startAt}}&endAt={{endAt}}&type={{metric_type}}
+Authorization: Bearer {{admin-token}}
+
+### As admin GET current_website_id /stats
+GET {{url}}/api/websites/{{current_website_id}}/stats?startAt={{startAt}}&endAt={{endAt}}
+Authorization: Bearer {{admin-token}}

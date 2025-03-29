@@ -1,0 +1,8 @@
+### GET users as admin
+GET {{url}}/api/admin/users
+Authorization: Bearer {{admin-token}}
+
+> {%
+    import {verifyReturnCode} from "../common.js";
+    verifyReturnCode(client, response, 200);
+%}

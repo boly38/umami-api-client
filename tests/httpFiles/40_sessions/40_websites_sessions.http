@@ -1,0 +1,6 @@
+### As admin GET current_website_id /sessions
+GET {{url}}/api/websites/{{current_website_id}}/sessions?startAt={{startAt}}&endAt={{endAt}}&unit=hour&tz={{tz}}
+Authorization: Bearer {{admin-token}}
+
+### TODO complete me
+# https://umami.is/docs/api/sessions-api

@@ -1,0 +1,56 @@
+### POST team with name:$teamName
+POST {{url}}/api/teams
+Authorization: Bearer {{user-token}}
+Content-Type: application/json
+
+{
+  "name": "{{teamName}}"
+}
+
+> {%
+    import {verifyReturnCode} from "../common.js";
+    verifyReturnCode(client, response, 200);
+    // TODO : copy id as teamId in order to play with other teams API
+%}
+
+### GET all teams API DONT EXISTS
+
+### GET team identified by $teamId
+GET {{url}}/api/teams/{{teamId}}
+Authorization: Bearer {{user-token}}
+
+> {%
+    import {verifyReturnCode} from "../common.js";
+    verifyReturnCode(client, response, 200);
+%}
+
+### GET team identified by $teamId his users
+GET {{url}}/api/teams/{{teamId}}/users
+Authorization: Bearer {{user-token}}
+
+> {%
+    import {verifyReturnCode} from "../common.js";
+    verifyReturnCode(client, response, 200);
+%}
+
+### GET team identified by $teamIdhis website users
+GET {{url}}/api/teams/{{teamId}}/websites
+Authorization: Bearer {{user-token}}
+
+> {%
+    import {verifyReturnCode} from "../common.js";
+    verifyReturnCode(client, response, 200);
+%}
+
+### DELETE team identified by $teamId
+DELETE {{url}}/api/teams/{{teamId}}
+Authorization: Bearer {{user-token}}
+
+> {%
+    import {verifyReturnCode} from "../common.js";
+    verifyReturnCode(client, response, 200);
+%}
+
+
+### TODO complete me
+# https://umami.is/docs/api/teams-api

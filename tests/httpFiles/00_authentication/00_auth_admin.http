@@ -1,0 +1,17 @@
+### Authentication ADMIN
+POST {{url}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "{{admin_username}}",
+  "password": "{{admin_password}}"
+}
+
+> {%
+    import {verifyReturnCode} from "../common.js";
+    verifyReturnCode(client, response, 200);
+    const {user, token} = response.body;
+    const {id, username, role, createdAt, isAdmin } = user;
+    client.global.set("admin-token", token);
+    client.log(`"Loggued as ${username} (${role}) : admin-token is ${token}`);
+%}

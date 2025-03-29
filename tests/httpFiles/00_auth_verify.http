@@ -1,9 +1,0 @@
-### Verify who is connected
-GET {{url}}/api/auth/verify
-Authorization: Bearer {{user-token}}
-
-> {%
-     const {id, username, role, isAdmin } = response.body;
-     const token = client.global.get("user-token")
-     client.log(`"Loggued as ${username} (role:${role})`);
-%}

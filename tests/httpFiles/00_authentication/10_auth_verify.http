@@ -1,0 +1,19 @@
+### Verify admin-token
+GET {{url}}/api/auth/verify
+Authorization: Bearer {{admin-token}}
+
+> {%
+     const {id, username, role, isAdmin } = response.body;
+     const token = client.global.get("admin-token")
+     client.log(`"Loggued as ${username} (role:${role})`);
+%}
+
+### Verify user-token
+GET {{url}}/api/auth/verify
+Authorization: Bearer {{user-token}}
+
+> {%
+     const {id, username, role, isAdmin } = response.body;
+     const token = client.global.get("user-token")
+     client.log(`"Loggued as ${username} (role:${role})`);
+%}

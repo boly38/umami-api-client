@@ -1,8 +1,0 @@
-### GET users
-GET {{url}}/api/users
-Authorization: Bearer {{user-token}}
-
-> {%
-    import {verifyReturnCode} from "common.js";
-    verifyReturnCode(client, response, 200);
-%}
