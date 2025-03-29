@@ -1,6 +1,9 @@
 # umami-api-client continuous integration
-
 name: umami_api_client_ci
+permissions:
+  contents: read
+  pull-requests: write
+  pages: write
 
 # Controls when the action will run.
 on:
@@ -28,54 +31,52 @@ jobs:
     strategy:
       matrix:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-        node-version: [16.x]
+        node-version: [ 20.x ]
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-        cache-dependency-path: |
-          package-lock.json
+      # https://github.com/pnpm/action-setup
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
 
-    - name: Install dependencies
-      # - run: npm ci # need package.json.lock
-      run: npm install
+      - name: Install Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
 
-    - name: Run ci-tests with code coverage
-      run: |
-        npm i -g c8
-        npm run ci-test
+      - name: Install dependencies
+        run: |
+          echo "Installing dependencies..."
+          pnpm install --frozen-lockfile
 
-    - name: Report coverage to the PR
-      continue-on-error: true
-      uses: romeovs/lcov-reporter-action@v0.2.16
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        lcov-file: ./coverage/lcov.info
+      - name: Run ci-tests with code coverage
+        run: |
+          pnpm run ci-test
 
-    - name: Npm audit
-      uses: oke-py/npm-audit-action@v1.7.1
-      with:
-        audit_level: moderate
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        dedupe_issues: true
+      - name: Report coverage to the PR
+        continue-on-error: true
+        uses: romeovs/lcov-reporter-action@v0.2.16
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          lcov-file: ./coverage/lcov.info
 
-    - name: Publish NpmJS package
-      if: github.ref == 'refs/heads/npmjs'
-      run: |
-        echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_DEPLOY_TOKEN }}" > .npmrc
-        npm whoami # rely on .npmrc
-        npm publish
+      - name: Publish NpmJS package
+        if: github.ref == 'refs/heads/npmjs'
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_DEPLOY_TOKEN }}" > .npmrc
+          npm whoami # rely on .npmrc
+          npm publish
 
-    - name: "Deploy Github Pages (code-coverage)"
-      if: github.ref == 'refs/heads/npmjs'
-      uses: JamesIves/github-pages-deploy-action@v4.2.5
-      with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        BRANCH: gh-pages
-        FOLDER: coverage/
+      - name: "Deploy Github Pages (code-coverage)"
+        if: github.ref == 'refs/heads/npmjs'
+        uses: JamesIves/github-pages-deploy-action@v4.2.5
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: coverage/
