@@ -35,6 +35,7 @@ pnpm run ci-test
 ```bash
 # provide PAT with permissions to create release on current repository
 export GREN_GITHUB_TOKEN=your_token_here
+pnpm i -g github-release-notes@latest
 
 git fetch --all && git pull
 # make a release vX with all history
