@@ -1,7 +1,7 @@
 # umami-api-client continuous integration
 name: umami_api_client_ci
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
   pages: write
 
@@ -75,8 +75,6 @@ jobs:
 
       - name: "Deploy Github Pages (code-coverage)"
         if: github.ref == 'refs/heads/npmjs'
-        uses: JamesIves/github-pages-deploy-action@v4.2.5
+        uses: JamesIves/github-pages-deploy-action@v4.7.3
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: gh-pages
-          FOLDER: coverage/
+          folder: coverage/
