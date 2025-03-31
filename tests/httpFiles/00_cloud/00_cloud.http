@@ -1,0 +1,42 @@
+### Verify cloud API key
+# https://umami.is/docs/cloud/api-key
+GET {{url}}/me
+Accept: application/json
+x-umami-api-key: {{cloud-api-key}}
+
+> {%
+    import {verifyReturnCode} from "../common.js";
+    verifyReturnCode(client, response, 200);
+%}
+
+
+### cloud websites
+# https://umami.is/docs/cloud/api-key
+GET {{url}}/websites
+Accept: application/json
+x-umami-api-key: {{cloud-api-key}}
+
+> {%
+    import {verifyReturnCode} from "../common.js";
+    verifyReturnCode(client, response, 200);
+%}
+
+### reset and GET current_website_id
+< {%
+    client.global.set("current_website_id", "xxx-yyy-zzz");
+%}
+GET {{url}}/websites/{{current_website_id}}
+x-umami-api-key: {{cloud-api-key}}
+
+### GET current_website_id /events + Set StartAt to now-1week...endAt:now
+< {%
+    const now = Date.now();
+    const oneDaySec = 24 * 60 * 60 * 1000;
+    const oneWeekAgo = now - 7 * oneDaySec;
+    client.global.set("startAt", oneWeekAgo);
+    client.global.set("endAt", now);
+    console.log(`StartAt: ${oneWeekAgo} (${new Date(oneWeekAgo).toUTCString()})`);
+    console.log(`EndAt: ${now} (${new Date(now).toUTCString()})`);
+%}
+GET {{url}}/websites/{{current_website_id}}/events?startAt={{startAt}}&endAt={{endAt}}&unit=hour&timezone={{tz}}
+x-umami-api-key: {{cloud-api-key}}

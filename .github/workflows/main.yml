@@ -23,10 +23,12 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      UMAMI_SERVER: ${{secrets.UMAMI_SERVER}}
-      UMAMI_USER: ${{secrets.UMAMI_USER}}
-      UMAMI_PASSWORD: ${{secrets.UMAMI_PASSWORD}}
-      UMAMI_SITE_DOMAIN: ${{secrets.UMAMI_SITE_DOMAIN}}
+      UMAMI_TEST_HOSTED_SERVER: ${{secrets.UMAMI_SERVER}}
+      UMAMI_TEST_HOSTED_DOMAIN: ${{secrets.UMAMI_SITE_DOMAIN}}
+      UMAMI_TEST_USER: ${{secrets.UMAMI_USER}}
+      UMAMI_TEST_PASSWORD: ${{secrets.UMAMI_PASSWORD}}
+      UMAMI_TEST_CLOUD_DOMAIN: ${{secrets.UMAMI_TEST_CLOUD_DOMAIN}}
+      UMAMI_TEST_CLOUD_API_KEY: ${{secrets.UMAMI_TEST_CLOUD_API_KEY}}
 
     strategy:
       matrix:
@@ -34,47 +36,55 @@ jobs:
         node-version: [ 20.x ]
 
     steps:
-      - name: Checkout code
+      - name: SETUP - Checkout
         uses: actions/checkout@v4
 
       # https://github.com/pnpm/action-setup
-      - name: Install pnpm
+      - name: SETUP - Install pnpm
         uses: pnpm/action-setup@v4
         with:
           run_install: false
 
-      - name: Install Node.js ${{ matrix.node-version }}
+      - name: SETUP - Install Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
           cache-dependency-path: pnpm-lock.yaml
 
-      - name: Install dependencies
+      - name: SETUP - Install dependencies
         run: |
           echo "Installing dependencies..."
           pnpm install --frozen-lockfile
 
-      - name: Run ci-tests with code coverage
+      - name: TEST - run ci-tests with c8 code coverage
         run: |
           pnpm run ci-test
 
-      - name: Report coverage to the PR
+      - name: COVERAGE - Report coverage on pull request
+        if: github.event_name == 'pull_request'
         continue-on-error: true
-        uses: romeovs/lcov-reporter-action@v0.2.16
+        # uses: romeovs/lcov-reporter-action@v0.2.16 # https://github.com/romeovs/lcov-reporter-action/issues/10
+        uses: andybelltree/lcov-reporter-action@v1.7.0 # https://github.com/andybelltree/lcov-reporter-action/releases
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
           lcov-file: ./coverage/lcov.info
+          filter-changed-files: true
 
-      - name: Publish NpmJS package
+      - name: COVERAGE - Deploy tag coverage report on Github Pages
+        uses: peaceiris/actions-gh-pages@v4
+        if: github.ref_type == 'tag'
+        with:
+          github_token: ${{ secrets.GH_ACTIONS_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./coverage/lcov-report
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+          commit_message: ${{ github.event.head_commit.message }}
+          force_orphan: true
+
+      - name: PACKAGE - PUBLISH - NpmJS package
         if: github.ref == 'refs/heads/npmjs'
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_DEPLOY_TOKEN }}" > .npmrc
           npm whoami # rely on .npmrc
           npm publish
-
-      - name: "Deploy Github Pages (code-coverage)"
-        if: github.ref == 'refs/heads/npmjs'
-        uses: JamesIves/github-pages-deploy-action@v4.7.3
-        with:
-          folder: coverage/

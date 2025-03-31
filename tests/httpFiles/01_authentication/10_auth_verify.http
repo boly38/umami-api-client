@@ -1,4 +1,5 @@
 ### Verify admin-token
+# 2.0.17 : bug for /auth/verify, it accepts GET instead of POST. Will be fixed in the next version, but use GET for now
 GET {{url}}/api/auth/verify
 Authorization: Bearer {{admin-token}}
 

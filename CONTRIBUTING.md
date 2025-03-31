@@ -15,19 +15,22 @@ git clone https://github.com/boly38/umami-api-client.git
 cd umami-api-client
 pnpm install
 # setup test env
-cp ./env/initenv.template.sh ./env/initenv.dontpush.sh
-# edit ./env/initenv.dontpush.sh then source it
-. ./env/initenv.dontpush.sh
+cp ./env/initenv_project.template.sh ./env/initenv_project.dontpush.sh
+# edit ./env/initenv_project.dontpush.sh then source it
+. ./env/initenv_project.dontpush.sh
 ````
 
 ## HowTo test
 * Then run manual test
 
 ````bash
-. ./env/initenv.dontpush.sh
+. ./env/initenv_project.dontpush.sh
+# run all tests
 pnpm run test
-# or with code coverage
+# run all tests with code coverage
 pnpm run ci-test
+# run a single test file
+tst=10_negative pnpm run tst
 ````
 
 ## HowTo release using Gren
