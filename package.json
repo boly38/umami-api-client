@@ -4,10 +4,16 @@
   "description": "Umami API nodeJS client",
   "main": "./lib/export.js",
   "type": "module",
+  "scripts_doc": {
+    "ci-test": "c8 : config into '.nycrc' file. think about increasing functions coverage 60=>80 when deprecated functions will be removed"
+  },
   "scripts": {
+    "cloud": "node ./tests/manual/cloud_sample.js",
+    "hosted": "node ./tests/manual/host_sample.js",
     "audit": "pnpm audit",
     "test": "mocha tests/*.test.js",
-    "ci-test": "c8 pnpm run test"
+    "ci-test": "c8 pnpm run test",
+    "tst": "echo windows %TST% test&& mocha --trace-warnings --exit --timeout 180000 --unhandled-rejections=strict tests/%TST%.test.js"
   },
   "private": false,
   "author": "Boly38 <boly38@gmail.com>",
@@ -29,7 +35,7 @@
   "copyright": {
     "title": "umami-api-client",
     "years": [
-      2022
+      2022,2025
     ],
     "author": "Brice Vandeputte"
   },
