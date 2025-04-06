@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "node-fetch": "^3.3.2",
-    "query-string": "^8.1.0",
+    "query-string": "^9.1.1",
     "winston": "^3.11.0"
   },
   "devDependencies": {

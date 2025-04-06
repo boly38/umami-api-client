@@ -15,8 +15,8 @@ importers:
         specifier: ^3.3.2
         version: 3.3.2
       query-string:
-        specifier: ^8.1.0
-        version: 8.2.0
+        specifier: ^9.1.1
+        version: 9.1.1
       winston:
         specifier: ^3.11.0
         version: 3.17.0
@@ -467,9 +467,9 @@ packages:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
 
-  query-string@8.2.0:
-    resolution: {integrity: sha512-tUZIw8J0CawM5wyGBiDOAp7ObdRQh4uBor/fUR9ZjmbZVvw95OD9If4w3MQxr99rg0DJZ/9CIORcpEqU5hQG7g==}
-    engines: {node: '>=14.16'}
+  query-string@9.1.1:
+    resolution: {integrity: sha512-MWkCOVIcJP9QSKU52Ngow6bsAWAPlPK2MludXvcrS2bGZSl+T1qX9MZvRIkqUIkGLJquMJHWfsT6eRqUpp4aWg==}
+    engines: {node: '>=18'}
 
   randombytes@2.1.0:
     resolution: {integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==}
@@ -1039,7 +1039,7 @@ snapshots:
 
   picomatch@2.3.1: {}
 
-  query-string@8.2.0:
+  query-string@9.1.1:
     dependencies:
       decode-uri-component: 0.4.1
       filter-obj: 5.1.0
