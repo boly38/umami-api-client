@@ -40,3 +40,7 @@ x-umami-api-key: {{cloud-api-key}}
 %}
 GET {{url}}/websites/{{current_website_id}}/events?startAt={{startAt}}&endAt={{endAt}}&unit=hour&timezone={{tz}}
 x-umami-api-key: {{cloud-api-key}}
+
+### As admin GET current_website_id /sessions top 5 by views
+GET {{url}}/websites/{{current_website_id}}/sessions?startAt={{startAt}}&endAt={{endAt}}&pageSize=5&orderBy=-views
+x-umami-api-key: {{cloud-api-key}}

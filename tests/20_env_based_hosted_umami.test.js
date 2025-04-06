@@ -90,64 +90,38 @@ describe(`env based UmamiClient targeting hosted umami instance`, function () {
         }
     });
 
-    it("should get /website/{id}/stats for 1h", async function () {
+    it("should get /website/{id}/stats for 1h/24h/7d/30d/1m", async function () {
         expectTestInputOrSkip("siteData", siteData, this.skip.bind(this));
-        const result = await client.websiteStats(siteData.id, '1h');
-        assumeObjectResult(`${siteData.name}'s stats 1 hour`, result);
+        for (const period of ['1h', '24h', '7d', '30d', '1m']) {
+            const result = await client.websiteStats(siteData.id, period);
+            assumeObjectResult(`${siteData.name}'s stats ${period}`, result);
+        }
     });
 
-    it("should get /website/{id}/stats for 24h", async function () {
+    it("should get /website/{id}/pageviews for 24h/7d", async function () {
         expectTestInputOrSkip("siteData", siteData, this.skip.bind(this));
-        const result = await client.websiteStats(siteData.id, '24h');
-        assumeObjectResult(`${siteData.name}'s stats 24h`, result);
+        for (const period of ['24h', '7d']) {
+            const options = period === '24h' ? undefined : {unit: 'day', timezone: 'Europe/Paris'};
+            const result = await client.websitePageViews(siteData.id, period, options);
+            assumeObjectResult(`${siteData.name}'s pageviews ${period}`, result);
+        }
     });
 
-    it("should get /website/{id}/stats for 7 days", async function () {
+    it("should get /website/{id}/events for 24h/7d/30d", async function () {
         expectTestInputOrSkip("siteData", siteData, this.skip.bind(this));
-        const result = await client.websiteStats(siteData.id, '7d');
-        assumeObjectResult(`${siteData.name}'s stats 7 days`, result);
+        for (const period of ['24h', '7d', '30d']) {
+            const result = await client.websiteEvents(siteData.id, period);
+            assumeListResult(`${siteData.name}'s events ${period} days`, result.data, mayBeEmpty, verbose);
+        }
     });
 
-    it("should get /website/{id}/stats for 30d", async function () {
+    it("should get /website/{id}/sessions for 24h/7d/30d", async function () {
         expectTestInputOrSkip("siteData", siteData, this.skip.bind(this));
-        const result = await client.websiteStats(siteData.id, '30d');
-        assumeObjectResult(`${siteData.name}'s stats 30d`, result);
-    });
-
-    it("should get /website/{id}/stats for 1 month", async function () {
-        expectTestInputOrSkip("siteData", siteData, this.skip.bind(this));
-        const result = await client.websiteStats(siteData.id, '1m');
-        assumeObjectResult(`${siteData.name}'s stats 1 month`, result);
-    });
-
-    it("should get /website/{id}/pageviews for 24h", async function () {
-        expectTestInputOrSkip("siteData", siteData, this.skip.bind(this));
-        const result = await client.websitePageViews(siteData.id, '24h');
-        assumeObjectResult(`${siteData.name}'s pageviews 24h`, result);
-    });
-
-    it("should get /website/{id}/pageviews for 7 days", async function () {
-        expectTestInputOrSkip("siteData", siteData, this.skip.bind(this));
-        const result = await client.websitePageViews(siteData.id, '7d', {unit: 'day', timezone: 'Europe/Paris'});
-        assumeObjectResult(`${siteData.name}'s pageviews 7 days`, result);
-    });
-
-    it("should get /website/{id}/events for 24h", async function () {
-        expectTestInputOrSkip("siteData", siteData, this.skip.bind(this));
-        const result = await client.websiteEvents(siteData.id, '24h');
-        assumeListResult(`${siteData.name}'s events 24h`, result.data, mayBeEmpty, verbose);
-    });
-
-    it("should get /website/{id}/events for 7 days", async function () {
-        expectTestInputOrSkip("siteData", siteData, this.skip.bind(this));
-        const result = await client.websiteEvents(siteData.id, '7d', {unit: 'day', timezone: 'Europe/Paris'});
-        assumeListResult(`${siteData.name}'s events 7 days`, result.data, mayBeEmpty, verbose);
-    });
-
-    it("should get /website/{id}/events for 30 days", async function () {
-        expectTestInputOrSkip("siteData", siteData, this.skip.bind(this));
-        const result = await client.websiteEvents(siteData.id, '30d', {unit: 'day', timezone: 'Europe/Paris'});
-        assumeListResult(`${siteData.name}'s events 30 days`, result.data, mayBeEmpty, verbose);
+        const onlyTopFiveByView = {"pageSize": 5, "orderBy": "-views"};
+        for (const period of ['24h', '7d', '30d']) {
+            const result = await client.websiteSessions(siteData.id, period, onlyTopFiveByView);
+            assumeListResult(`${siteData.name}'s sessions ${period}`, result.data, mayBeEmpty, verbose);
+        }
     });
 
     // all types are : ['url', 'referrer', 'browser', 'os', 'device', 'country', 'event']

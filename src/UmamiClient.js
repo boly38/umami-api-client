@@ -185,14 +185,27 @@ export default class UmamiClient {
 
     // GET /api/website/{id}/pageviews
     // https://umami.is/docs/api/website-stats-api#get-apiwebsiteswebsiteidpageviews
-    async websitePageViews(websiteId, period = "24h", options = {unit: 'hour', timezone: 'Europe/Paris'}) {
+    async websitePageViews(websiteId, period = "24h", options = {
+        unit: 'hour', timezone: 'Europe/Paris'
+        /* url, referrer, title, host, os, browser, device, country, region, city */
+    }) {
         return this.websiteData(websiteId, 'pageviews', period, options);
     }
 
     // GET /api/website/{id}/events
     // https://umami.is/docs/api/events-api#get-apiwebsiteswebsiteidevents
-    async websiteEvents(websiteId, period = "24h", options = {unit: 'hour', timezone: 'Europe/Paris'}) {
+    async websiteEvents(websiteId, period = "24h", options = {
+        /* query, page, pageSize, orderBy */
+    }) {
         return this.websiteData(websiteId, 'events', period, options);
+    }
+
+    // GET /api/website/{id}/sessions
+    // https://umami.is/docs/api/sessions-api#get-apiwebsiteswebsiteidsessions
+    async websiteSessions(websiteId, period = "24h", options = {
+        /* query, page, pageSize, orderBy */
+    }) {
+        return this.websiteData(websiteId, 'sessions', period, options);
     }
 
     // GET /api/website/{id}/metrics
