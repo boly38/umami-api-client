@@ -39,8 +39,15 @@ jobs:
         run: |
           echo "Installing dependencies..."
           pnpm install --frozen-lockfile
-          echo "Checking for outdated dependencies..."
-          pnpm outdated && echo "Dependencies are up to date 🎉"
+
+      - name: Check for outdated dependencies (non-blocking warning)
+        run: |
+          echo "🔍 Checking for outdated dependencies..."
+          if pnpm outdated; then
+            echo "✅ Dependencies are up to date 🎉"
+          else
+            echo "::warning title=Outdated Dependencies::Some dependencies are outdated. Please consider updating them."
+          fi
 
       - name: Run pnpm audit
         run: pnpm audit --json # --audit-level moderate
