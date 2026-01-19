@@ -2,51 +2,45 @@
 
 [![NPM](https://nodei.co/npm/umami-api-client.png?compact=true)](https://npmjs.org/package/umami-api-client)
 
-Umami [ReST API](https://umami.is/docs/api).
+Umami [ReST API](https://umami.is/docs/api) client for Node.js.
 
-- compatible with JavaScript.
+## ⚠️ Version Notice
 
-Note that a typescript compatible API client exists (but deprecated/archived) : cf. https://github.com/jakobbouchard/umami-api-client
+**Current version: v3.0.3** - Targets **Umami v3.x API**
 
-## UmamiClient
-Features
+| umami-api-client | Umami Server | Status |
+|------------------|--------------|--------|
+| **v3.0.3** | **Umami v3.x** | ✅ **Current** |
+| v2.17.3 | Umami v2.x | ❌ EOL |
 
-using apiKey:
-- login
-- getSites
-- getStats, getPageViews, getEvents, getMetrics
+📚 **[Migration Guide v2 → v3](./MIGRATION_V3.md)** - Breaking changes & upgrade instructions
 
-accepted periods are : `1h`, `1d`, `7d`, `30d`, `31d`.
+---
 
-# Quick start
+## Features
 
-First, set up your environment :
+- ✅ **Dual mode**: Umami Cloud (API key) & Hosted (login/password)
+- ✅ **Complete API**: websites, stats, pageviews, events, metrics, sessions
+- ✅ **Periods**: `1h`, `24h`, `7d`, `1w`, `30d`, `1m`
+- ✅ **v3 compatible**: Works with Umami v3.0.x API
+- 🔜 **v3 features** (coming in v3.1.0): Links, Pixels, Segments APIs
 
-````bash
-cp ./env/initenv_cloud.template.sh ./env/initenv_cloud.dontpush.sh
-# update ./env/initenv_cloud.dontpush.sh
-. ./env/initenv_cloud.dontpush.sh
-````
-
-install umami-api-client
+## Installation
 
 ```bash
-pnpm install umami-api-client
+npm install umami-api-client@^3.0.3
 # or
-npm install umami-api-client
+pnpm add umami-api-client@^3.0.3
 ```
 
-then let's go, cf. example below.
+**Upgrading from v2.x?** Read the **[Migration Guide](./MIGRATION_V3.md)**
 
-### HowTo use UmamiClient with Umami Cloud server ?
-Umami Cloud is "Umami as a service" : cf. https://cloud.umami.is/
+---
 
-Rely on following mandatory variable ([setup your own](https://cloud.umami.is/api-keys)) : UMAMI_CLOUD_API_KEY
+## Quick Start
 
-NOTE: when an API key is set, the cloud mode is always activated (!) prior to hosted mode. To use hosted mode, you will have to unset UMAMI_CLOUD_API_KEY or use explicit config.
-
-
-[`$ node.exe ./tests/manual/cloud_sample.js`](./tests/manual/cloud_sample.js)
+### Umami Cloud (API Key)
+Umami Cloud: https://cloud.umami.is/ ([Get your API key](https://cloud.umami.is/api-keys))
 ````javascript
 import UmamiClient from 'umami-api-client';
 
@@ -73,15 +67,9 @@ const doIt = async () => {
 doIt().then(r => {});
 ````
 
-### HowTo use UmamiClient with an Umami hosted server ?
+### Umami Hosted (Self-hosted)
 
-**Umami hosted server** is a server with [umami product](https://github.com/umami-software/umami) hosted by you or by a company which is not Umami (or for ex. locally using docker).
-
-So a URL is available to query Umami hosted server (aka `UMAMI_SERVER`). Ex. `https://umami.exemple.com`
-
-By default, UmamiClient rely on following environment variables : `UMAMI_SERVER` `UMAMI_USER` `UMAMI_PASSWORD`
-
-[`$ node.exe ./tests/manual/host_sample.js`](./tests/manual/host_sample.js)
+Self-hosted Umami instance with login/password authentication.
 ````javascript
 import UmamiClient from 'umami-api-client';
 
@@ -107,21 +95,57 @@ const doIt = async () => {
 doIt().then(r => {});
 ````
 
-Note that relying on environment is not mandatory, you could use explicit config or arguments.
-ex.
+### Explicit Configuration (no env vars)
+
 ```javascript
-var client = new UmamiClient({server:'umami.exemple.com'});
-await client.login("admin","mySecret");
+// Cloud mode
+const client = new UmamiClient({ cloudApiKey: 'your-api-key' });
+
+// Hosted mode
+const client = new UmamiClient({ server: 'https://umami.example.com' });
+await client.login('admin', 'password');
 ```
 
-### HowTo better understand UmamiClient use ?
+---
 
-You could play mocha tests to get more examples (cf. [CONTRIBUTING](./CONTRIBUTING.md)).
+## API Methods
+
+### Authentication
+- `me()` - Get user info (Cloud mode)
+- `login(username, password)` - Login (Hosted mode)
+- `logout()` - Logout (Hosted mode)
+
+### Websites
+- `websites()` - List all websites
+- `selectSiteByDomain(sites, domain)` - Select site by domain
+
+### Statistics
+- `websiteStats(websiteId, period, options)` - Get website stats
+- `websitePageViews(websiteId, period, options)` - Get pageviews timeline
+- `websiteMetrics(websiteId, period, options)` - Get metrics (urls, referrers, browsers, etc.)
+- `websiteEvents(websiteId, period, options)` - Get events (paginated)
+- `websiteSessions(websiteId, period, options)` - Get sessions (paginated)
+
+### Periods
+Accepted values: `1h`, `24h`, `7d`, `1w`, `30d`, `1m`
+
+See [tests/manual/](./tests/manual/) for more examples.
+
+---
 
 
-## How to contribute
+## Documentation
 
-cf. [CONTRIBUTING](./CONTRIBUTING.md)
+- 📚 **[Migration Guide v2 → v3](./MIGRATION_V3.md)** - Breaking changes & upgrade path
+- 👨‍💻 **[Contributing Guide](./CONTRIBUTING.md)** - Setup, tests, release process
+- 🧪 **[Tests Documentation](./tests/TestsReadme.md)** - Running tests
+- 📝 **[Umami API Docs](https://umami.is/docs/api)** - Official API reference
+
+---
+
+## Contributing
+
+Contributions welcome! See [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 ### Services or activated bots
 
@@ -134,4 +158,10 @@ cf. [CONTRIBUTING](./CONTRIBUTING.md)
 - [Houndci](https://houndci.com/) : JavaScript  automated review (configured by `.hound.yml`)
 - [gren](https://github.com/github-tools/github-release-notes) : [Release notes](https://github.com/boly38/umami-api-client/releases) automation
 - Github pages [website](https://boly38.github.io/umami-api-client/) hosts some metrics for the main branch of this project: [code coverage](https://boly38.github.io/umami-api-client/)
+
+---
+
+## License
+
+MIT - See [LICENSE](./LICENSE)
 

@@ -2,12 +2,18 @@
 
 ## Stack
 
-NPM package (ESM) - Umami API Client v2.17.3 → v3.x.x  
+NPM package (ESM) - Umami API Client **v3.0.3** (targets Umami v3.x API)  
 Node.js | node-fetch, query-string, winston | Mocha, Chai, c8
 
 ## Principes
 
 SOLID, KISS, DRY | Tests avant commit | pnpm only (sauf npm publish)
+
+**Doc DRY/SRP**: 1 info = 1 endroit, utiliser liens (pas duplication)
+- README.md: Quick Start + API ref
+- MIGRATION_V3.md: Breaking changes v2→v3
+- CHANGELOG.md: Historique versions
+- CONTRIBUTING.md: Setup dev/release
 
 ## Workflow
 
@@ -15,7 +21,7 @@ SOLID, KISS, DRY | Tests avant commit | pnpm only (sauf npm publish)
 2. Méthode API → Auth headers → Fetch → Validation réponse
 3. Tests Mocha (pas arrow functions: besoin `this.skip()`)
 4. Test manuel: `pnpm run cloud|hosted`
-5. Doc: README + JSDoc méthodes publiques
+5. Doc: JSDoc + mettre à jour fichier approprié (DRY/SRP)
 
 ## Structure
 
@@ -30,11 +36,12 @@ env/initenv_*.template.sh  ← Config templates
 ## Commandes
 
 ```bash
-pnpm install               # Setup
-pnpm test                  # Tests
-pnpm run ci-test           # Tests + coverage c8
-TST=20_env pnpm run tst    # Test ciblé
-pnpm run cloud|hosted      # Test manuel
+pnpm install                               # Setup
+pnpm test                                  # All tests
+pnpm run ci-test                           # Tests + coverage c8
+TST=30_env_based_cloud_umami pnpm run xtst # Test ciblé (Linux/Mac)
+TST=30_env_based_cloud_umami pnpm run tst  # Test ciblé (Windows)
+pnpm run cloud|hosted                      # Test manuel
 
 # Debug (env vars)
 UMAMI_CLIENT_DEBUG=true              # Global
@@ -46,6 +53,15 @@ UMAMI_CLIENT_DEBUG_RESPONSE=true     # Réponses
 
 Priorité outils IDE: Refactor, Search, Navigate, Git UI  
 Éviter: scripts bash (sed/awk/grep), npm (utiliser pnpm)
+
+**Modification fichiers problématiques**:  
+Si échec modification directe → Créer fichier temporaire + `mv` :  
+```bash
+cp original.md original_TEMP.md  # ou créer nouveau contenu
+# ... modifications ...
+rm original.md
+mv original_TEMP.md original.md
+```
 
 ## Conventions
 
@@ -68,12 +84,12 @@ me()                                   // Cloud only
 websites()                             // Liste sites
 websiteStats(id, period, options)
 websitePageViews(id, period, options)
-websiteMetrics(id, period, options)   // type: url|event
+websiteMetrics(id, period, options)   // type: path|event|referrer|browser|os|device|country|...
 websiteEvents(id, period, options)
 websiteSessions(id, period, options)
 ```
 
-**Déprécié v2 (à supprimer v3)**: `getSites()`, `getStats()`, `getPageViews()`... (cf. `//~ DEPRECATED WORLD`)
+**v3 Breaking**: Deprecated v2 methods removed. See [MIGRATION_V3.md](../MIGRATION_V3.md)
 
 ## Références
 
