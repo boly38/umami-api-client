@@ -94,11 +94,7 @@ export default class UmamiClient {
         return authData;
     }
 
-    // TODO : POST /auth/verify - postponed in 2.0.17's next version
-    //  as there is bug on method to use (v2.0.17 - verify works only with GET)
-    async verify() {
-        throw new Error("NotYetAvailable - wait for https://github.com/umami-software/umami/issues/3339");
-    }
+
 
     /**
      * cloud mode only
@@ -210,7 +206,8 @@ export default class UmamiClient {
 
     // GET /api/website/{id}/metrics
     // https://umami.is/docs/api/website-stats-api#get-apiwebsiteswebsiteidmetrics
-    async websiteMetrics(websiteId, period = "24h", options = {type: 'url', unit: 'hour', timezone: 'Europe/Paris'}) {
+    // Note: In Umami v3, 'url' type was renamed to 'path'
+    async websiteMetrics(websiteId, period = "24h", options = {type: 'path', unit: 'hour', timezone: 'Europe/Paris'}) {
         return this.websiteData(websiteId, 'metrics', period, options);
     }
 
@@ -227,88 +224,6 @@ export default class UmamiClient {
             throw new Error(`Invalid ${name} UID format. Must be a valid UUID-like string.`);
         }
         return true;
-    }
-
-    //~ DEPRECATED WORLD
-
-    /**
-     * @deprecated : use now websites() - to be removed in futur version
-     */
-    async getSites(authData) {
-        this.lastAuthData = authData;
-        return this.websites();
-    }
-
-    /**
-     * @deprecated : please use websiteStats(id, period) - to be removed in futur version
-     */
-    async getStats(authData, siteData, period = '24h') {
-        this.lastAuthData = authData;
-        return await this.websiteStats(siteData.id, period);
-    }
-
-    /**
-     * @deprecated : please use websiteStats(id, '24h') - to be removed in futur version
-     */
-    async getStatsForLast24h(authData, siteData) {
-        this.lastAuthData = authData;
-        return await this.websiteStats(siteData.id, '24h');
-    }
-
-    /**
-     * @deprecated : please use websitePageViews(id, period, options) - to be removed in futur version
-     */
-    async getPageViews(authData, siteData, options = {unit: 'hour', timezone: 'Europe/Paris'}, period = '24h') {
-        this.lastAuthData = authData;
-        return await this.websitePageViews(siteData.id, period, options);
-    }
-
-    /**
-     * @deprecated : please use websitePageViews(id, '24h', options) - to be removed in futur version
-     */
-    async getPageViewsForLast24h(authData, siteData, options = {unit: 'hour', timezone: 'Europe/Paris'}) {
-        this.lastAuthData = authData;
-        return await this.websitePageViews(siteData.id, '24h', options);
-    }
-
-    /**
-     * @deprecated : please use websiteEvents(id, '24h', options) - to be removed in futur version
-     */
-    async getEventsForLast24h(authData, siteData, options = {unit: 'hour', timezone: 'Europe/Paris'}) {
-        this.lastAuthData = authData;
-        return await this.websiteEvents(siteData.id, '24h', options);
-    }
-
-    /**
-     * @deprecated : please use websiteEvents(id, period, options) - to be removed in futur version
-     */
-    async getEvents(authData, siteData, options = {unit: 'hour', timezone: 'Europe/Paris'}, period = '24h') {
-        this.lastAuthData = authData;
-        return await this.websiteEvents(siteData.id, period, options);
-    }
-
-    /**
-     * @deprecated : use now websiteStats(...) or websitePageviews - to be removed in futur version
-     */
-    async getWebSiteDataForAPeriod(authData, siteData, dataDescription = 'stats', dataPath = '/stats', period = '24h', options = {}) {
-        this.lastAuthData = authData;
-        return this.websiteData(siteData.id, dataPath.split('/')[0], period, options);
-    }
-
-    /**
-     * @deprecated : use now websiteMetrics(siteData.id, '24h', options) - to be removed in futur version
-     */
-    async getMetricsForLast24h(authData, siteData, options) {
-        this.lastAuthData = authData;
-        return await this.websiteMetrics(siteData.id, '24h', options);
-    }
-
-    /**
-     * @deprecated : use now websiteMetrics(siteData.id, period, options) - to be removed in futur version
-     */
-    async getMetrics(authData, siteData, options, period = '24h') {
-        this.lastAuthData = authData;
-        return await this.websiteMetrics(siteData.id, period, options);
     }
 
 }
@@ -328,17 +243,7 @@ const assumeResponseSuccess = async function (response, errorMsg) {
         throw new Error(`${response.status} - ${errorMsg} - ` + await response.text());
     }
 };
-const givenAuthData = (authData) => {
-    if (!isSet(authData) || !isSet(authData.token)) {
-        throw new Error("expect valid auth data to query api");
-    }
-};
-const givenAuthAndSiteData = (authData, siteData) => {
-    givenAuthData(authData);
-    if (!isUmamiSiteData(siteData)) {
-        throw new Error("Unexpected site data provided");
-    }
-};
+
 const HOUR_IN_MS = (60000 * 60);
 const DAY_IN_MS = (HOUR_IN_MS * 24);
 const HOUR_PERIODS = ['1h', '1hour', '60min'];

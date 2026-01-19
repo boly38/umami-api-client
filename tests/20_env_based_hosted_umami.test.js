@@ -63,8 +63,15 @@ describe(`env based UmamiClient targeting hosted umami instance`, function () {
     it("should not login", async function () {
         try {
             await client.login("admin", "hack!Me");
+            assert.fail("Expected login to fail with wrong credentials");
         } catch (error) {
-            assert.equal(error.message, `401 - Login failed - {"error":"message.incorrect-username-password"}`);
+            // Umami v3 changed error format from v2
+            // v2: {"error":"message.incorrect-username-password"}
+            // v3: {"error":{"message":"Unauthorized","code":"incorrect-username-password","status":401}}
+            assert.ok(error.message.includes('401'), 'Error should contain status 401');
+            assert.ok(error.message.includes('Login failed'), 'Error should mention login failure');
+            assert.ok(error.message.includes('incorrect-username-password') || error.message.includes('Unauthorized'), 
+                'Error should mention incorrect credentials');
         }
     });
 
@@ -124,10 +131,11 @@ describe(`env based UmamiClient targeting hosted umami instance`, function () {
         }
     });
 
-    // all types are : ['url', 'referrer', 'browser', 'os', 'device', 'country', 'event']
+    // all types are : ['path', 'referrer', 'browser', 'os', 'device', 'country', 'event']
+    // Note: 'url' was renamed to 'path' in Umami v3
     it("should get /website/{id}/metrics for 24h", async function () {
         expectTestInputOrSkip("siteData", siteData, this.skip.bind(this));
-        for (const type of ['url', 'referrer']) {
+        for (const type of ['path', 'referrer']) {
             const result = await client.websiteMetrics(siteData.id, '24h', {type});
             assumeListResult(`${siteData.name}'s 24h metrics type:${type}`, result, mayBeEmpty, verbose);
         }

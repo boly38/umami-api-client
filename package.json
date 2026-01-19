@@ -5,15 +5,16 @@
   "main": "./lib/export.js",
   "type": "module",
   "scripts_doc": {
-    "ci-test": "c8 : config into '.nycrc' file. think about increasing functions coverage 60=>80 when deprecated functions will be removed"
+    "ci-test": "c8 : config into '.nycrc' file. Deprecated functions removed in v3."
   },
   "scripts": {
     "cloud": "node ./tests/manual/cloud_sample.js",
     "hosted": "node ./tests/manual/host_sample.js",
     "audit": "pnpm audit",
-    "test": "mocha tests/*.test.js",
+    "test": "mocha --timeout 180000 tests/*.test.js",
     "ci-test": "c8 pnpm run test",
-    "tst": "echo windows %TST% test&& mocha --trace-warnings --exit --timeout 180000 --unhandled-rejections=strict tests/%TST%.test.js"
+    "tst": "echo windows %TST% test&& mocha --trace-warnings --exit --timeout 180000 --unhandled-rejections=strict tests/%TST%.test.js",
+    "xtst": "echo linux $TST test && mocha --trace-warnings --exit --timeout 180000 --unhandled-rejections=strict tests/$TST.test.js"
   },
   "private": false,
   "author": "Boly38 <boly38@gmail.com>",

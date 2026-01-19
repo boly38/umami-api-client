@@ -125,10 +125,11 @@ describe("env based UmamiClient targeting umami CLOUD", function () {
         assumeListResult(`${siteData.name}'s events 30 days`, result?.data, mayBeEmpty, verbose);
     });
 
-    // all types are : ['url', 'referrer', 'browser', 'os', 'device', 'country', 'event']
+    // all types are : ['path', 'referrer', 'browser', 'os', 'device', 'country', 'event']
+    // Note: 'url' was renamed to 'path' in Umami v3
     it("should get /website/{id}/metrics for 24h", async function () {
         expectTestInputOrSkip("siteData", siteData, this.skip.bind(this));
-        for (const type of ['url', 'referrer']) {
+        for (const type of ['path', 'referrer']) {
             const result = await client.websiteMetrics(siteData.id, '24h', {type});
             assumeListResult(`${siteData.name}'s 24h metrics type:${type}`, result, mayBeEmpty, verbose);
         }

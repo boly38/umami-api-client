@@ -10,11 +10,11 @@
 
 **1 issue = 1 fichier `.github/issue_*.md`**
 
-- ✅ Toute modification/documentation se fait DANS ce fichier
-- ✅ Cocher tâches au fur et à mesure
-- ✅ Ajouter notes/découvertes en section dédiée
-- ❌ NE PAS créer de fichiers annexes (.github/PHASE*.md, UPDATE*.md, etc.)
-- ❌ NE PAS documenter ailleurs (sauf si explicitement demandé)
+- ✅ Tout DANS ce fichier: cocher tâches, ajouter notes
+- ❌ PAS de fichiers annexes (.github/PHASE*.md, UPDATE*.md)
+- ❌ PAS documenter ailleurs (sauf demande explicite)
+
+**Doc DRY/SRP**: 1 info = 1 endroit. README/MIGRATION_V3/CHANGELOG ont chacun leur scope (voir `/agent.md`)
 
 ## Structure issue_*.md
 
