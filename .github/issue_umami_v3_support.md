@@ -69,120 +69,114 @@
 
 **✅ Phase 1 = v3.0.3 publiable**
 
-### ✅ Phase 2: Nouvelles méthodes (features v3)
+### 🚧 Phase 2: Nouvelles méthodes (features v3) - READ-ONLY
 
-**Status**: 📋 Ready to start (après Phase 1)  
+**Status**: 🚧 In Progress  
 **Priority**: Medium  
-**Effort**: 2-3 days  
-**Version cible**: v3.1.0 (post v3.0.0)
+**Effort**: 1-2 days  
+**⚠️ SCOPE**: Read-only APIs only (no write operations)
 
-#### 🔗 Links API - Track short URLs and redirects
+#### ✅ Links API - Read short URLs and redirects stats
 
-**Endpoints**:
-- [ ] `links(options)` - GET /api/links
-- [ ] `createLink(data)` - POST /api/links
-- [ ] `getLink(linkId)` - GET /api/links/:linkId
-- [ ] `updateLink(linkId, data)` - POST /api/links/:linkId
-- [ ] `deleteLink(linkId)` - DELETE /api/links/:linkId
-- [ ] `linkStats(linkId, period, options)` - GET /api/links/:linkId/stats
+**Endpoints** (READ-ONLY):
+- [x] `links(options)` - GET /api/links
+- [x] `getLink(linkId)` - GET /api/links/:linkId
+- [x] `linkStats(linkId, period, options)` - Alias for websiteStats (links use GET /api/websites/:linkId/stats)
+
+**Architecture Note**: In Umami v3, links reuse the websites stats infrastructure. The `linkId` serves as `websiteId` in the stats endpoint. `linkStats()` is an alias for `websiteStats()` for semantic clarity.
 
 **Data structure**:
 ```javascript
-// createLink
-{
-  url: "https://example.com/long-url",
-  description: "My link"
-}
-
-// Response
-{
-  id: "uuid",
-  url: "https://example.com/long-url",
-  description: "My link",
-  createdAt: "2025-01-19T..."
-}
+// Response from links()
+[
+  {
+    id: "uuid",
+    url: "https://example.com/long-url",
+    description: "My link",
+    createdAt: "2025-01-19T..."
+  }
+]
 ```
 
 **Tests**:
-- [ ] Create link
-- [ ] List links
-- [ ] Get link stats
-- [ ] Update/Delete link
+- [x] List links
+- [x] Get link details
+- [x] Get link stats
+- [x] Manual test script (`tests/manual/test_links.js`)
+- [x] Unit tests (`tests/40_links_api.test.js`)
+
+**Documentation**:
+- [x] JSDoc comments in `UmamiClient.js`
+- [x] README.md updated (API methods + usage example)
+- [x] agent.md updated (methods reference)
+- [x] Complete API guide (`docs/LINKS_API.md`)
 
 ---
 
-#### 📊 Pixels API - Track with invisible images
+#### 📊 Pixels API - Read pixel tracking stats
 
-Track email open rates, external sites.
+Read email open rates, external sites tracking data.
 
-**Endpoints**:
+**Endpoints** (READ-ONLY):
 - [ ] `pixels(options)` - GET /api/pixels
-- [ ] `createPixel(data)` - POST /api/pixels
 - [ ] `getPixel(pixelId)` - GET /api/pixels/:pixelId
-- [ ] `updatePixel(pixelId, data)` - POST /api/pixels/:pixelId
-- [ ] `deletePixel(pixelId)` - DELETE /api/pixels/:pixelId
 - [ ] `pixelStats(pixelId, period, options)` - GET /api/pixels/:pixelId/stats
 
 **Data structure**:
 ```javascript
-// createPixel
-{
-  websiteId: "uuid",
-  name: "Newsletter open tracker"
-}
-
-// Response
-{
-  id: "uuid",
-  websiteId: "uuid",
-  name: "Newsletter open tracker",
-  createdAt: "2025-01-19T..."
-}
+// Response from pixels()
+[
+  {
+    id: "uuid",
+    websiteId: "uuid",
+    name: "Newsletter open tracker",
+    createdAt: "2025-01-19T..."
+  }
+]
 ```
 
 **Tests**:
-- [ ] Create pixel
 - [ ] List pixels
+- [ ] Get pixel details
 - [ ] Get pixel stats
-- [ ] Update/Delete pixel
 
 ---
 
-#### 🎯 Segments API - Save and reuse filter sets
+#### 🎯 Segments API - Read saved filter sets
 
-**Endpoints**:
+**Endpoints** (READ-ONLY):
 - [ ] `segments(options)` - GET /api/segments
-- [ ] `createSegment(data)` - POST /api/segments
 - [ ] `getSegment(segmentId)` - GET /api/segments/:segmentId
-- [ ] `updateSegment(segmentId, data)` - POST /api/segments/:segmentId
-- [ ] `deleteSegment(segmentId)` - DELETE /api/segments/:segmentId
 
 **Data structure**:
 ```javascript
-// createSegment
-{
-  websiteId: "uuid",
-  name: "Windows users from US",
-  filters: {
-    os: "Windows",
-    country: "US"
+// Response from segments()
+[
+  {
+    id: "uuid",
+    websiteId: "uuid",
+    name: "Windows users from US",
+    filters: {
+      os: "Windows",
+      country: "US"
+    },
+    createdAt: "2025-01-19T..."
   }
-}
+]
 ```
 
 **Tests**:
-- [ ] Create segment
 - [ ] List segments
-- [ ] Apply segment as filter
-- [ ] Update/Delete segment
+- [ ] Get segment details
+- [ ] Apply segment as filter in queries
 
 ---
 
-#### 👨‍💼 Admin API (optional)
+#### 👨‍💼 Admin API (optional) - READ-ONLY
 
-Admin-only endpoints for user/team/website management.
+Admin-only endpoints for reading user/team/website data.
 
-**Endpoints**:
+**Endpoints** (READ-ONLY):
 - [ ] `adminWebsites(options)` - GET /api/admin/websites
 - [ ] `adminUsers(options)` - GET /api/admin/users
 - [ ] `adminTeams(options)` - GET /api/admin/teams
@@ -190,10 +184,12 @@ Admin-only endpoints for user/team/website management.
 **Requirements**:
 - Admin role required
 - Only for Hosted mode (Cloud has no admin API)
+- ⚠️ Read-only: No user/team/website creation or modification
 
 **Tests**:
 - [ ] List all websites (admin)
 - [ ] List all users (admin)
+- [ ] List all teams (admin)
 - [ ] Check permission denied for non-admin
 
 ---
@@ -203,7 +199,7 @@ Admin-only endpoints for user/team/website management.
 All methods follow same pattern as existing endpoints:
 
 ```javascript
-// In src/UmamiClient.js
+// In src/UmamiClient.js (READ-ONLY pattern)
 
 async links(options = { page: 1, pageSize: 10 }) {
     const headers = this.authHeaders();
@@ -213,18 +209,24 @@ async links(options = { page: 1, pageSize: 10 }) {
     return await response.json();
 }
 
-async createLink(data) {
-    const headers = { ...this.authHeaders(), 'Content-Type': 'application/json' };
-    const response = await fetch(`${this.umamiBaseUrl}/links`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(data)
-    });
-    await assumeResponseSuccess(response, 'Unable to create link');
+async getLink(linkId) {
+    this.validateUID(linkId, 'linkId');
+    const headers = this.authHeaders();
+    const url = `${this.umamiBaseUrl}/links/${linkId}`;
+    const response = await fetch(url, { headers });
+    await assumeResponseSuccess(response, 'Unable to get link');
     return await response.json();
 }
 
-// etc...
+async linkStats(linkId, period = '24h', options = {}) {
+    this.validateUID(linkId, 'linkId');
+    const queryOptions = enrichOptionsWithPeriod(options, period);
+    const headers = this.authHeaders();
+    const url = `${this.umamiBaseUrl}/links/${linkId}/stats?` + queryString.stringify(queryOptions);
+    const response = await fetch(url, { headers });
+    await assumeResponseSuccess(response, 'Unable to get link stats');
+    return await response.json();
+}
 ```
 
 ### ✅ Phase 3: Enhanced Features
@@ -294,49 +296,68 @@ async createLink(data) {
 
 ---
 
-## Endpoints API v3 à implémenter
+## Endpoints API v3 à implémenter (READ-ONLY)
 
 ```javascript
-// Links
+// Links (READ-ONLY)
 GET    /api/links                    → links()
-POST   /api/links                    → createLink(data)
 GET    /api/links/:linkId            → getLink(linkId)
-POST   /api/links/:linkId            → updateLink(linkId, data)
-DELETE /api/links/:linkId            → deleteLink(linkId)
 GET    /api/links/:linkId/stats      → linkStats(linkId, period, options)
 
-// Pixels
+// Pixels (READ-ONLY)
 GET    /api/pixels                   → pixels()
-POST   /api/pixels                   → createPixel(data)
 GET    /api/pixels/:pixelId          → getPixel(pixelId)
-POST   /api/pixels/:pixelId          → updatePixel(pixelId, data)
-DELETE /api/pixels/:pixelId          → deletePixel(pixelId)
 GET    /api/pixels/:pixelId/stats    → pixelStats(pixelId, period, options)
 
-// Segments
+// Segments (READ-ONLY)
 GET    /api/segments                 → segments()
-POST   /api/segments                 → createSegment(data)
 GET    /api/segments/:segmentId      → getSegment(segmentId)
-POST   /api/segments/:segmentId      → updateSegment(segmentId, data)
-DELETE /api/segments/:segmentId      → deleteSegment(segmentId)
 
-// Admin (optionnel)
+// Admin (READ-ONLY)
 GET    /api/admin/websites           → adminWebsites()
 GET    /api/admin/users              → adminUsers()
 GET    /api/admin/teams              → adminTeams()
+```
+
+### ❌ Out of Scope (Write Operations)
+
+The following endpoints will **NOT** be implemented (read-only client):
+
+```javascript
+// Links - EXCLUDED
+POST   /api/links                    → createLink() ❌
+POST   /api/links/:linkId            → updateLink() ❌
+DELETE /api/links/:linkId            → deleteLink() ❌
+
+// Pixels - EXCLUDED
+POST   /api/pixels                   → createPixel() ❌
+POST   /api/pixels/:pixelId          → updatePixel() ❌
+DELETE /api/pixels/:pixelId          → deletePixel() ❌
+
+// Segments - EXCLUDED
+POST   /api/segments                 → createSegment() ❌
+POST   /api/segments/:segmentId      → updateSegment() ❌
+DELETE /api/segments/:segmentId      → deleteSegment() ❌
+
+// Admin - EXCLUDED
+POST   /api/admin/users              → createUser() ❌
+POST   /api/admin/teams              → createTeam() ❌
+POST   /api/admin/websites           → createWebsite() ❌
+// ... all write operations on admin resources
 ```
 
 ---
 
 ## ✅ Décisions prises (KISS)
 
-### 1. Versioning: **3.0.0** → **3.1.0** (staged release)
-- ✅ **v3.0.0** - Base compatibility (breaking changes fixes)
-- ✅ **v3.1.0** - New features (Links, Pixels, Segments)
+### 1. Versioning: **v3.x.x** (progressive implementation)
+- ✅ **v3.0.3** - Base compatibility (breaking changes fixes)
+- ✅ **v3.x.x** - New features added progressively (Links, Pixels, Segments...)
 - ✅ **v3 ONLY** - Pas de rétro-compatibilité v2
 - ✅ Clean break, align avec Umami v3
 - ✅ Code simple (pas de dual support)
 - 📌 Users v2 **restent sur `2.17.3`**
+- 📌 No version commitment for new features (released when ready)
 
 ### 2. Support v2: **ABANDONNÉ**
 - ❌ Pas de maintenance v2.17.x
@@ -364,13 +385,15 @@ GET    /api/admin/teams              → adminTeams()
 
 ## Checkboxes globales
 
-- [ ] Phase 1: Compatibilité API v3 (tests, breaking changes, cleanup v2) → **v3.0.0**
-- [ ] Phase 2: Nouvelles méthodes (Links, Pixels, Segments, Admin) → **v3.1.0**
-- [ ] Phase 3: Enhanced features (Distinct ID, filters, attribution) → **v3.1.0**
+- [x] Phase 1: Compatibilité API v3 (tests, breaking changes, cleanup v2)
+- [x] Phase 2.1: Links API (Read-only)
+- [ ] Phase 2.2: Pixels API (Read-only)
+- [ ] Phase 2.3: Segments API (Read-only)
+- [ ] Phase 2.4: Admin API (Read-only, optional)
+- [ ] Phase 3: Enhanced features (Distinct ID, filters, attribution)
 - [ ] Phase 4: Tests (mocks v3, suite tests, tests réels)
-- [ ] Phase 5: Release 3.0.0 (doc BREAKING, cleanup, publish)
-- [ ] Phase 5: Release 3.1.0 (new features doc, publish)
-- [ ] Migration guide (v2.17.3 vs v3.0.0 vs v3.1.0)
+- [ ] Phase 5: Releases progressives (doc, cleanup, publish)
+- [x] Migration guide v2 → v3
 - [ ] Issue fermée ✅
 
 ---

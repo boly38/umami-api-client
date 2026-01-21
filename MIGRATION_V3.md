@@ -213,14 +213,14 @@ These methods have **identical responses** in v2 and v3:
 
 ## 🆕 New Features in v3
 
-Umami v3 introduces **new tracking capabilities** (coming in `umami-api-client@3.1.0`):
+Umami v3 introduces **new tracking capabilities**:
 
-- 🔗 **Links** - Short URLs tracking
-- 🖼️ **Pixels** - Invisible image tracking (email open rates)
-- 📊 **Segments** - Save and reuse filter sets
-- 🔧 **Admin API** - User/team management (hosted only)
+- ✅ **Links** - Short URLs tracking (read-only, available now)
+- 🔜 **Pixels** - Invisible image tracking (in development)
+- 🔜 **Segments** - Save and reuse filter sets (in development)
+- 🔜 **Admin API** - User/team management (in development, hosted only)
 
-See [issue #44](https://github.com/boly38/umami-api-client/issues/44) for implementation status.
+See [issue #43](https://github.com/boly38/umami-api-client/issues/43) for implementation status.
 
 ---
 
