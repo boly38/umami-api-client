@@ -211,6 +211,66 @@ export default class UmamiClient {
         return this.websiteData(websiteId, 'metrics', period, options);
     }
 
+    //~ Links API (Umami v3.x) - READ-ONLY
+
+    /**
+     * Get all links (short URLs tracking)
+     * GET /api/links
+     * @param {Object} options - Query options
+     * @param {number} options.page - Page number (default: 1)
+     * @param {number} options.pageSize - Results per page (default: 50)
+     * @param {string} options.search - Search text
+     * @param {string} options.orderBy - Sort field (default: 'createdAt')
+     * @returns {Promise<Object>} Links data with pagination
+     */
+    async links(options = {}) {
+        const defaultOptions = {page: 1, pageSize: 50};
+        const queryOptions = {...defaultOptions, ...options};
+        const headers = this.authHeaders();
+        const url = `${this.umamiBaseUrl}/links?` + queryString.stringify(queryOptions);
+        debugRequest(`url:${url}`);
+        const response = await fetch(url, {headers});
+        await assumeResponseSuccess(response, 'Unable to get links');
+        const data = await response.json();
+        debugResponse(data);
+        return data;
+    }
+
+    /**
+     * Get a single link by ID
+     * GET /api/links/:linkId
+     * @param {string} linkId - Link UUID
+     * @returns {Promise<Object>} Link details
+     */
+    async getLink(linkId) {
+        this.validateUID(linkId, 'linkId');
+        const headers = this.authHeaders();
+        const url = `${this.umamiBaseUrl}/links/${linkId}`;
+        debugRequest(`url:${url}`);
+        const response = await fetch(url, {headers});
+        await assumeResponseSuccess(response, 'Unable to get link');
+        const data = await response.json();
+        debugResponse(data);
+        return data;
+    }
+
+    /**
+     * Get link statistics
+     * Note: In Umami v3, links use the websites stats endpoint with linkId as websiteId
+     * This is an alias for websiteStats() for semantic clarity when working with links
+     * @param {string} linkId - Link UUID (used as websiteId in the stats endpoint)
+     * @param {string} period - Time period (1h, 24h, 7d, 30d, etc.)
+     * @param {Object} options - Query options
+     * @param {string} options.unit - Time unit (hour, day, month, year)
+     * @param {string} options.timezone - Timezone (default: 'Europe/Paris')
+     * @returns {Promise<Object>} Link statistics
+     */
+    async linkStats(linkId, period = '24h', options = {unit: 'hour', timezone: 'Europe/Paris'}) {
+        // Links use the websites stats endpoint: GET /api/websites/:linkId/stats
+        // where linkId serves as the websiteId
+        return this.websiteStats(linkId, period, options);
+    }
+
     validateUID(uid, name) {
         if (!uid || typeof uid !== 'string' || uid.trim() === '') {
             throw new Error(`${name} is required and must be a non-empty string.`);

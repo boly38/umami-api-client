@@ -76,17 +76,25 @@ Publish: `npm publish` (CI doit être OK)
 **Modes**: Cloud (`UMAMI_CLOUD_API_KEY` → `api.umami.is/v1`) | Hosted (`UMAMI_SERVER`+creds → `<server>/api`)  
 **Périodes**: `1h`, `1d`, `7d`, `30d`, `31d` (variantes: `24h`, `1week`...)
 
-**Méthodes**:
+**Méthodes** (READ-ONLY):
 ```javascript
+// Auth
 new UmamiClient({cloudApiKey, server}) // Auto-détection mode
 login(user, pass)                      // Hosted only
 me()                                   // Cloud only
+
+// Websites
 websites()                             // Liste sites
 websiteStats(id, period, options)
 websitePageViews(id, period, options)
 websiteMetrics(id, period, options)   // type: path|event|referrer|browser|os|device|country|...
 websiteEvents(id, period, options)
 websiteSessions(id, period, options)
+
+// Links (v3.x) - Short URLs tracking
+links(options)                         // Liste short URLs (page, pageSize, search)
+getLink(linkId)                        // Détails link
+linkStats(linkId, period, options)     // Stats link
 ```
 
 **v3 Breaking**: Deprecated v2 methods removed. See [MIGRATION_V3.md](../MIGRATION_V3.md)
