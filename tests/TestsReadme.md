@@ -30,6 +30,7 @@ set TST=30_env_based_cloud_umami && pnpm run tst
 - `20_env_based_hosted_umami.test.js` - Hosted mode tests
 - `30_env_based_cloud_umami.test.js` - Cloud mode tests
 - `40_links_api.test.js` - Links API tests (requires UMAMI_TEST_LINKS=true)
+- `50_pixels_api.test.js` - Pixels API tests (requires UMAMI_TEST_PIXELS=true)
 
 ### Environment setup
 
@@ -56,4 +57,17 @@ TST=40_links_api pnpm run xtst
 export UMAMI_TEST_LINKS=true
 source env/initenv_host.dontpush.sh
 TST=40_links_api pnpm run xtst
+```
+
+**Pixels API tests** (requires pixels created in Umami):
+```bash
+# Cloud mode
+export UMAMI_TEST_PIXELS=true
+source env/initenv_cloud.dontpush.sh
+TST=50_pixels_api pnpm run xtst
+
+# Hosted mode
+export UMAMI_TEST_PIXELS=true
+source env/initenv_host.dontpush.sh
+TST=50_pixels_api pnpm run xtst
 ```

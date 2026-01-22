@@ -3,7 +3,7 @@ import {expect} from 'chai';
 import {env} from 'node:process';
 
 /**
- * Tests for Links API (Umami v3.x)
+ * Tests for Pixels API (Umami v3.x)
  * READ-ONLY operations only
  * 
  * Environment variables required:
@@ -12,15 +12,15 @@ import {env} from 'node:process';
  */
 
 const verbose = env.VERBOSE === 'true';
-const skipTests = env.UMAMI_TEST_LINKS === 'false';
+const skipTests = env.UMAMI_TEST_PIXELS === 'false';
 
-describe("Links API (Umami v3.x) - READ-ONLY", function () {
+describe("Pixels API (Umami v3.x) - READ-ONLY", function () {
     let client = null;
-    let testLinkId = null;
+    let testPixelId = null;
 
     before(async function () {
         if (skipTests) {
-            console.log('⏭️  Skipping Links API tests (UMAMI_TEST_LINKS=false)');
+            console.log('⏭️  Skipping Pixels API tests (UMAMI_TEST_PIXELS=false)');
             this.skip();
             return;
         }
@@ -31,7 +31,7 @@ describe("Links API (Umami v3.x) - READ-ONLY", function () {
         if (isCloudMode) {
             client = new UmamiClient({cloudApiKey: env.UMAMI_CLOUD_API_KEY});
             if (verbose) {
-                console.info('Test against Umami Cloud (Links API)');
+                console.info('Test against Umami Cloud (Pixels API)');
             }
         } else {
             const {UMAMI_SERVER, UMAMI_USER, UMAMI_PASSWORD} = env;
@@ -41,99 +41,101 @@ describe("Links API (Umami v3.x) - READ-ONLY", function () {
             client = new UmamiClient({server: UMAMI_SERVER});
             await client.login(UMAMI_USER, UMAMI_PASSWORD);
             if (verbose) {
-                console.info(`Test against Umami Hosted (${UMAMI_SERVER}) - Links API`);
+                console.info(`Test against Umami Hosted (${UMAMI_SERVER}) - Pixels API`);
             }
         }
 
-        // Get first link ID for tests
+        // Get first pixel ID for tests
         try {
-            const linksData = await client.links({pageSize: 1});
-            if (linksData?.data && linksData.data.length > 0) {
-                testLinkId = linksData.data[0].id;
+            const pixelsData = await client.pixels({pageSize: 1});
+            if (pixelsData?.data && pixelsData.data.length > 0) {
+                testPixelId = pixelsData.data[0].id;
                 if (verbose) {
-                    console.info(`Using test link ID: ${testLinkId}`);
+                    console.info(`Using test pixel ID: ${testPixelId}`);
                 }
             } else {
-                console.warn('⚠️  No links found - some tests will be skipped');
+                console.warn('⚠️  No pixels found - some tests will be skipped');
             }
         } catch (error) {
-            console.warn('⚠️  Could not fetch links (feature might not be available):', error.message);
+            console.warn('⚠️  Could not fetch pixels (feature might not be available):', error.message);
             this.skip();
         }
     });
 
-    describe('links() - GET /api/links', function () {
-        it('should retrieve links list', async function () {
-            const data = await client.links();
+    describe('pixels() - GET /api/pixels', function () {
+        it('should retrieve pixels list', async function () {
+            const data = await client.pixels();
             expect(data).to.be.an('object');
             expect(data).to.have.property('data');
             expect(data.data).to.be.an('array');
             
             if (verbose && data.data.length > 0) {
-                console.log(`Retrieved ${data.data.length} links`);
+                console.log(`Retrieved ${data.data.length} pixels`);
             }
         });
 
         it('should support pagination options', async function () {
-            const data = await client.links({page: 1, pageSize: 5});
+            const data = await client.pixels({page: 1, pageSize: 5});
             expect(data).to.be.an('object');
             expect(data.data).to.be.an('array');
             expect(data.data.length).to.be.at.most(5);
         });
 
         it('should support search parameter', async function () {
-            const data = await client.links({search: 'test', pageSize: 10});
+            const data = await client.pixels({search: 'test', pageSize: 10});
             expect(data).to.be.an('object');
             expect(data.data).to.be.an('array');
         });
 
-        it('should validate link data structure', async function () {
-            const data = await client.links({pageSize: 1});
+        it('should validate pixel data structure', async function () {
+            const data = await client.pixels({pageSize: 1});
             if (data.data && data.data.length > 0) {
-                const link = data.data[0];
-                expect(link).to.have.property('id');
-                expect(link).to.have.property('url');
-                expect(link).to.have.property('createdAt');
-                expect(link.id).to.be.a('string');
-                expect(link.url).to.be.a('string');
+                const pixel = data.data[0];
+                expect(pixel).to.have.property('id');
+                expect(pixel).to.have.property('name');
+                expect(pixel).to.have.property('slug');
+                expect(pixel).to.have.property('createdAt');
+                expect(pixel.id).to.be.a('string');
+                expect(pixel.slug).to.be.a('string');
             }
         });
     });
 
-    describe('getLink() - GET /api/links/:linkId', function () {
-        it('should retrieve link details by ID', async function () {
-            if (!testLinkId) {
+    describe('getPixel() - GET /api/pixels/:pixelId', function () {
+        it('should retrieve pixel details by ID', async function () {
+            if (!testPixelId) {
                 this.skip();
             }
             
-            const linkData = await client.getLink(testLinkId);
-            expect(linkData).to.be.an('object');
-            expect(linkData).to.have.property('id');
-            expect(linkData.id).to.equal(testLinkId);
-            expect(linkData).to.have.property('url');
-            expect(linkData.url).to.be.a('string');
+            const pixelData = await client.getPixel(testPixelId);
+            expect(pixelData).to.be.an('object');
+            expect(pixelData).to.have.property('id');
+            expect(pixelData.id).to.equal(testPixelId);
+            expect(pixelData).to.have.property('name');
+            expect(pixelData).to.have.property('slug');
+            expect(pixelData.slug).to.be.a('string');
             
             if (verbose) {
-                console.log(`Link URL: ${linkData.url}`);
+                console.log(`Pixel: ${pixelData.name} (${pixelData.slug})`);
             }
         });
 
-        it('should throw error for invalid link ID', async function () {
+        it('should throw error for invalid pixel ID', async function () {
             try {
-                await client.getLink('invalid-id');
+                await client.getPixel('invalid-id');
                 expect.fail('Should have thrown error for invalid ID');
             } catch (error) {
                 expect(error).to.be.an('error');
-                expect(error.message).to.match(/Invalid linkId/i);
+                expect(error.message).to.match(/Invalid pixelId/i);
             }
         });
 
-        it('should throw error for non-existent link ID', async function () {
+        it('should throw error for non-existent pixel ID', async function () {
             const fakeId = '00000000-0000-0000-0000-000000000000';
             try {
-                const result = await client.getLink(fakeId);
+                const result = await client.getPixel(fakeId);
                 if (verbose) {
-                    console.log('⚠️  API returned for non-existent link:', result);
+                    console.log('⚠️  API returned for non-existent pixel:', result);
                 }
                 // Accept this behavior - some APIs return null/empty instead of 404
                 expect(result === null || result === undefined || Object.keys(result || {}).length === 0).to.be.true;
@@ -142,44 +144,44 @@ describe("Links API (Umami v3.x) - READ-ONLY", function () {
                     console.log('✅ API threw error:', error.message);
                 }
                 expect(error).to.be.an('error');
-                expect(error.message).to.match(/(Unable to get link|Not found|404)/i);
+                expect(error.message).to.match(/(Unable to get pixel|Not found|404)/i);
             }
         });
     });
 
-    describe('linkStats() - GET /api/websites/:linkId/stats (alias)', function () {
-        it('should retrieve link stats for 24h period', async function () {
-            if (!testLinkId) {
+    describe('pixelStats() - GET /api/websites/:pixelId/stats (alias)', function () {
+        it('should retrieve pixel stats for 24h period', async function () {
+            if (!testPixelId) {
                 this.skip();
             }
 
             try {
-                const stats = await client.linkStats(testLinkId, '24h');
+                const stats = await client.pixelStats(testPixelId, '24h');
                 expect(stats).to.be.an('object');
                 // Stats structure depends on Umami's response
-                // Note: linkStats() is an alias for websiteStats()
+                // Note: pixelStats() is an alias for websiteStats()
                 if (verbose) {
-                    console.log('Link stats (24h):', JSON.stringify(stats, null, 2));
+                    console.log('Pixel stats (24h):', JSON.stringify(stats, null, 2));
                 }
             } catch (error) {
-                // Link might not have any data yet
+                // Pixel might not have any data yet
                 if (verbose) {
-                    console.log('⚠️  No stats available for link');
+                    console.log('⚠️  No stats available for pixel');
                 }
             }
         });
 
         it('should support different time periods', async function () {
-            if (!testLinkId) {
+            if (!testPixelId) {
                 this.skip();
             }
 
             try {
-                const stats7d = await client.linkStats(testLinkId, '7d', {unit: 'day'});
+                const stats7d = await client.pixelStats(testPixelId, '7d', {unit: 'day'});
                 expect(stats7d).to.be.an('object');
                 
                 if (verbose) {
-                    console.log('Link stats (7d):', JSON.stringify(stats7d, null, 2));
+                    console.log('Pixel stats (7d):', JSON.stringify(stats7d, null, 2));
                 }
             } catch (error) {
                 if (verbose) {
@@ -189,19 +191,19 @@ describe("Links API (Umami v3.x) - READ-ONLY", function () {
         });
 
         it('should be equivalent to websiteStats()', async function () {
-            if (!testLinkId) {
+            if (!testPixelId) {
                 this.skip();
             }
 
             try {
-                const linkStats = await client.linkStats(testLinkId, '24h');
-                const websiteStats = await client.websiteStats(testLinkId, '24h');
+                const pixelStats = await client.pixelStats(testPixelId, '24h');
+                const websiteStats = await client.websiteStats(testPixelId, '24h');
 
                 // Both methods should return the same data
-                expect(linkStats).to.deep.equal(websiteStats);
+                expect(pixelStats).to.deep.equal(websiteStats);
 
                 if (verbose) {
-                    console.log('✅ linkStats() and websiteStats() return identical data');
+                    console.log('✅ pixelStats() and websiteStats() return identical data');
                 }
             } catch (error) {
                 if (verbose) {
@@ -210,24 +212,24 @@ describe("Links API (Umami v3.x) - READ-ONLY", function () {
             }
         });
 
-        it('should validate linkId parameter', async function () {
+        it('should validate pixelId parameter', async function () {
             try {
-                await client.linkStats('invalid-id', '24h');
+                await client.pixelStats('invalid-id', '24h');
                 expect.fail('Should have thrown error for invalid ID');
             } catch (error) {
                 expect(error).to.be.an('error');
-                // linkStats() calls websiteStats(), so error message mentions websiteId
-                expect(error.message).to.match(/Invalid (linkId|websiteId)/i);
+                // pixelStats() calls websiteStats(), so error message mentions websiteId
+                expect(error.message).to.match(/Invalid (pixelId|websiteId) UID format/i);
             }
         });
 
         it('should validate period parameter', async function () {
-            if (!testLinkId) {
+            if (!testPixelId) {
                 this.skip();
             }
 
             try {
-                await client.linkStats(testLinkId, 'invalid-period');
+                await client.pixelStats(testPixelId, 'invalid-period');
                 expect.fail('Should have thrown error for invalid period');
             } catch (error) {
                 expect(error).to.be.an('error');
@@ -241,7 +243,7 @@ describe("Links API (Umami v3.x) - READ-ONLY", function () {
             client.logout();
         }
         if (verbose) {
-            console.log('✅ Links API tests completed');
+            console.log('✅ Pixels API tests completed');
         }
     });
 });

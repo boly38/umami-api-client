@@ -1,11 +1,11 @@
-# Umami v3 - New Features to Implement
+# Umami v3 - New Features Implementation Status
 
 ## Overview
 
 Umami v3 introduces **3 major new tracking capabilities** that didn't exist in v2:
-1. **Links** - Short URL tracking & analytics
-2. **Pixels** - Invisible image tracking (email opens, external sites)
-3. **Segments & Cohorts** - Saved filter sets & user groups
+1. **Links** - Short URL tracking & analytics ✅ **Implemented (read-only)**
+2. **Pixels** - Invisible image tracking (email opens, external sites) ✅ **Implemented (read-only)**
+3. **Segments & Cohorts** - Saved filter sets & user groups ❌ **Not implemented**
 
 ---
 
@@ -54,35 +54,30 @@ Umami v3 introduces **3 major new tracking capabilities** that didn't exist in v
 }
 ```
 
-### Methods to Implement
+### ✅ Methods Implemented (Read-Only)
 
 ```javascript
-// List & Search
+// List & Search ✅
 links(options?: {
   search?: string,
   page?: number,
   pageSize?: number
 })
 
-// CRUD
-createLink(data: {
-  name: string,
-  url: string,
-  slug?: string  // Auto-generated if not provided
-})
-
+// Get Link ✅
 getLink(linkId: string)
 
-updateLink(linkId: string, data: {
-  name?: string,
-  url?: string,
-  slug?: string
-})
-
-deleteLink(linkId: string)
-
-// Analytics
+// Analytics ✅
 linkStats(linkId: string, period?: string, options?: {})
+```
+
+### ❌ Methods NOT Implemented (Write Operations)
+
+```javascript
+// CRUD - Not implemented (read-only client)
+createLink()   ❌
+updateLink()   ❌
+deleteLink()   ❌
 ```
 
 ---
@@ -120,38 +115,38 @@ linkStats(linkId: string, period?: string, options?: {})
 }
 ```
 
-### Methods to Implement
+### ✅ Methods Implemented (Read-Only)
 
 ```javascript
-// List & Search
+// List & Search ✅
 pixels(options?: {
   search?: string,
   page?: number,
   pageSize?: number
 })
 
-// CRUD
-createPixel(data: {
-  name: string,
-  slug?: string  // Auto-generated if not provided
-})
-
+// Get Pixel ✅
 getPixel(pixelId: string)
 
-updatePixel(pixelId: string, data: {
-  name?: string,
-  slug?: string
-})
-
-deletePixel(pixelId: string)
-
-// Analytics
+// Analytics ✅
 pixelStats(pixelId: string, period?: string, options?: {})
+```
+
+### ❌ Methods NOT Implemented (Write Operations)
+
+```javascript
+// CRUD - Not implemented (read-only client)
+createPixel()  ❌
+updatePixel()  ❌
+deletePixel()  ❌
 ```
 
 ---
 
-## 🎯 3. Segments & Cohorts API
+## 🎯 3. Segments & Cohorts API ❌ **NOT IMPLEMENTED**
+
+> **⚠️ Status**: Not implemented in `umami-api-client`.  
+> Use the Umami web UI to manage segments and cohorts.
 
 **Use cases:**
 - **Segments**: Save frequently-used filter sets (e.g., "iOS users from France")
@@ -199,32 +194,29 @@ Cohorts are **user groups** defined by a common event/experience in a time perio
 | `GET` | `/api/cohorts` | List all cohorts |
 | `POST` | `/api/cohorts` | Create cohort |
 
-### Methods to Implement (Tentative)
+### ❌ Methods NOT Implemented
 
 ```javascript
-// Segments
-segments(options?: { page?, pageSize? })
-createSegment(data: {
-  name: string,
-  filters: object
-})
-getSegment(segmentId: string)
-updateSegment(segmentId: string, data)
-deleteSegment(segmentId: string)
+// All Segments/Cohorts methods are NOT implemented
+segments()        ❌
+createSegment()   ❌
+getSegment()      ❌
+updateSegment()   ❌
+deleteSegment()   ❌
 
-// Cohorts
-cohorts(options?: { page?, pageSize? })
-createCohort(data: {
-  name: string,
-  event: string,
-  dateRange: string
-})
-getCohort(cohortId: string)
+cohorts()         ❌
+createCohort()    ❌
+getCohort()       ❌
 ```
+
+> Use Umami web UI for segments and cohorts management.
 
 ---
 
-## 👨‍💼 4. Admin API (Optional)
+## 👨‍💼 4. Admin API ❌ **NOT IMPLEMENTED**
+
+> **⚠️ Status**: Not implemented in `umami-api-client`.  
+> Use the Umami web UI for admin operations.
 
 **Use case:** Admin-level management of the entire Umami instance (users, teams, websites)
 
@@ -236,56 +228,44 @@ getCohort(cohortId: string)
 | `GET` | `/api/admin/users` | List all users (admin) |
 | `GET` | `/api/admin/teams` | List all teams (admin) |
 
-### Methods to Implement
+### ❌ Methods NOT Implemented
 
 ```javascript
-// Admin only (requires admin role)
-adminWebsites(options?: { page?, pageSize? })
-adminUsers(options?: { page?, pageSize? })
-adminTeams(options?: { page?, pageSize? })
+// All Admin API methods are NOT implemented
+adminWebsites()   ❌
+adminUsers()      ❌
+adminTeams()      ❌
 ```
 
 ⚠️ **Note**: Only for **Hosted mode**. Umami Cloud doesn't expose admin API.
 
 ---
 
-## 📋 Implementation Checklist
+## ✅ Implementation Status (v3.0.3)
 
-### Phase 2.1 - Links API (v3.1.0)
-- [ ] `links()` - List links
-- [ ] `createLink()` - Create link
-- [ ] `getLink()` - Get link by ID
-- [ ] `updateLink()` - Update link
-- [ ] `deleteLink()` - Delete link
-- [ ] `linkStats()` - Get link statistics
-- [ ] Tests for Links API
-- [ ] Manual test scripts
+### Links API (Read-Only) ✅ COMPLETE
+- [x] `links()` - List links
+- [x] `getLink()` - Get link by ID
+- [x] `linkStats()` - Get link statistics
+- [x] Tests for Links API (`tests/40_links_api.test.js`)
+- [x] Manual test scripts (`tests/manual/test_links.js`)
+- [x] Documentation in README.md (API methods + usage examples)
+- ❌ Write operations NOT implemented (read-only client)
 
-### Phase 2.2 - Pixels API (v3.1.0)
-- [ ] `pixels()` - List pixels
-- [ ] `createPixel()` - Create pixel
-- [ ] `getPixel()` - Get pixel by ID
-- [ ] `updatePixel()` - Update pixel
-- [ ] `deletePixel()` - Delete pixel
-- [ ] `pixelStats()` - Get pixel statistics
-- [ ] Tests for Pixels API
-- [ ] Manual test scripts
+### Pixels API (Read-Only) ✅ COMPLETE
+- [x] `pixels()` - List pixels
+- [x] `getPixel()` - Get pixel by ID
+- [x] `pixelStats()` - Get pixel statistics
+- [x] Tests for Pixels API (`tests/50_pixels_api.test.js`)
+- [x] Manual test scripts (`tests/manual/test_pixels.js`)
+- [x] Documentation in README.md (API methods + usage examples)
+- ❌ Write operations NOT implemented (read-only client)
 
-### Phase 2.3 - Segments & Cohorts (v3.2.0 or later)
-- [ ] Research API endpoints (not documented yet)
-- [ ] `segments()` - List segments
-- [ ] `createSegment()` - Create segment
-- [ ] `getSegment()`, `updateSegment()`, `deleteSegment()`
-- [ ] Cohorts methods (if API available)
-- [ ] Tests for Segments/Cohorts
-- [ ] Manual test scripts
+### Segments & Cohorts ❌ NOT IMPLEMENTED
+- ❌ Not planned for `umami-api-client` (use Umami UI)
 
-### Phase 2.4 - Admin API (v3.2.0 or later)
-- [ ] `adminWebsites()` - List all websites
-- [ ] `adminUsers()` - List all users
-- [ ] `adminTeams()` - List all teams
-- [ ] Tests (require admin role)
-- [ ] Hosted-mode only check
+### Admin API ❌ NOT IMPLEMENTED
+- ❌ Not planned for `umami-api-client` (use Umami UI)
 
 ---
 
@@ -298,18 +278,22 @@ adminTeams(options?: { page?, pageSize? })
 
 ---
 
-## 📊 Priority & Effort Estimation
+## 📊 Implementation Summary
 
-| Feature | Priority | Effort | Target Version |
-|---------|----------|--------|----------------|
-| Links API | 🔴 High | 2 days | v3.1.0 |
-| Pixels API | 🔴 High | 2 days | v3.1.0 |
-| Segments API | 🟡 Medium | 3 days | v3.2.0 |
-| Cohorts API | 🟡 Medium | 3 days | v3.2.0 |
-| Admin API | 🟢 Low | 1 day | v3.2.0 |
+| Feature | Status | Version | Notes |
+|---------|--------|---------|-------|
+| Links API (read) | ✅ Complete | v3.0.3 | Read-only |
+| Pixels API (read) | ✅ Complete | v3.0.3 | Read-only |
+| Links API (write) | ❌ Not planned | - | Use Umami UI |
+| Pixels API (write) | ❌ Not planned | - | Use Umami UI |
+| Segments API | ❌ Not planned | - | Use Umami UI |
+| Cohorts API | ❌ Not planned | - | Use Umami UI |
+| Admin API | ❌ Not planned | - | Use Umami UI |
 
-**Total estimated effort**: ~11 days for complete v3 feature parity
+**Design decision**: `umami-api-client` is a **read-only analytics client**.  
+For write operations and admin tasks, use the Umami web interface.
 
 ---
 
-**Last updated**: 2026-01-20
+**Last updated**: 2026-01-19  
+**Current version**: v3.0.3

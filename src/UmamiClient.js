@@ -211,7 +211,9 @@ export default class UmamiClient {
         return this.websiteData(websiteId, 'metrics', period, options);
     }
 
-    //~ Links API (Umami v3.x) - READ-ONLY
+    //~ Links API (Umami v3.x) - READ-ONLY ✅
+    //~ Implemented: links(), getLink(), linkStats()
+    //~ Note: Links reuse websites stats endpoint (linkId = websiteId)
 
     /**
      * Get all links (short URLs tracking)
@@ -270,6 +272,77 @@ export default class UmamiClient {
         // where linkId serves as the websiteId
         return this.websiteStats(linkId, period, options);
     }
+
+    //~ Pixels API (Umami v3.x) - READ-ONLY ✅
+    //~ Implemented: pixels(), getPixel(), pixelStats()
+    //~ Note: Pixels reuse websites stats endpoint (pixelId = websiteId)
+
+    /**
+     * Get all pixels (tracking pixels for email opens, external sites, etc.)
+     * GET /api/pixels
+     * @param {Object} options - Query options
+     * @param {number} options.page - Page number (default: 1)
+     * @param {number} options.pageSize - Results per page (default: 50)
+     * @param {string} options.search - Search text
+     * @param {string} options.orderBy - Sort field (default: 'createdAt')
+     * @returns {Promise<Object>} Pixels data with pagination
+     */
+    async pixels(options = {}) {
+        const defaultOptions = {page: 1, pageSize: 50};
+        const queryOptions = {...defaultOptions, ...options};
+        const headers = this.authHeaders();
+        const url = `${this.umamiBaseUrl}/pixels?` + queryString.stringify(queryOptions);
+        debugRequest(`url:${url}`);
+        const response = await fetch(url, {headers});
+        await assumeResponseSuccess(response, 'Unable to get pixels');
+        const data = await response.json();
+        debugResponse(data);
+        return data;
+    }
+
+    /**
+     * Get a single pixel by ID
+     * GET /api/pixels/:pixelId
+     * @param {string} pixelId - Pixel UUID
+     * @returns {Promise<Object>} Pixel details
+     */
+    async getPixel(pixelId) {
+        this.validateUID(pixelId, 'pixelId');
+        const headers = this.authHeaders();
+        const url = `${this.umamiBaseUrl}/pixels/${pixelId}`;
+        debugRequest(`url:${url}`);
+        const response = await fetch(url, {headers});
+        await assumeResponseSuccess(response, 'Unable to get pixel');
+        const data = await response.json();
+        debugResponse(data);
+        return data;
+    }
+
+    /**
+     * Get pixel statistics
+     * Note: In Umami v3, pixels use the websites stats endpoint with pixelId as websiteId
+     * This is an alias for websiteStats() for semantic clarity when working with pixels
+     * @param {string} pixelId - Pixel UUID (used as websiteId in the stats endpoint)
+     * @param {string} period - Time period (1h, 24h, 7d, 30d, etc.)
+     * @param {Object} options - Query options
+     * @param {string} options.unit - Time unit (hour, day, month, year)
+     * @param {string} options.timezone - Timezone (default: 'Europe/Paris')
+     * @returns {Promise<Object>} Pixel statistics
+     */
+    async pixelStats(pixelId, period = '24h', options = {unit: 'hour', timezone: 'Europe/Paris'}) {
+        // Pixels use the websites stats endpoint: GET /api/websites/:pixelId/stats
+        // where pixelId serves as the websiteId
+        return this.websiteStats(pixelId, period, options);
+    }
+
+    //~ Umami v3.x APIs - NOT IMPLEMENTED ❌
+    //~ The following Umami v3 features are NOT available in this client:
+    //~   - Segments API (GET /api/segments) - Use Umami UI to manage segments
+    //~   - Cohorts API - Use Umami UI to manage cohorts
+    //~   - Admin API (GET /api/admin/*) - Admin operations not supported
+    //~   - Attribution reports - Not implemented
+    //~   - Write operations (POST/PUT/DELETE) on Links/Pixels - Read-only client
+    //~ For these features, please use the Umami web interface.
 
     validateUID(uid, name) {
         if (!uid || typeof uid !== 'string' || uid.trim() === '') {

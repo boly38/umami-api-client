@@ -95,6 +95,11 @@ websiteSessions(id, period, options)
 links(options)                         // Liste short URLs (page, pageSize, search)
 getLink(linkId)                        // Détails link
 linkStats(linkId, period, options)     // Stats link
+
+// Pixels (v3.x) - Tracking pixels (email opens, external sites)
+pixels(options)                        // Liste pixels (page, pageSize, search)
+getPixel(pixelId)                      // Détails pixel
+pixelStats(pixelId, period, options)   // Stats pixel
 ```
 
 **v3 Breaking**: Deprecated v2 methods removed. See [MIGRATION_V3.md](../MIGRATION_V3.md)
