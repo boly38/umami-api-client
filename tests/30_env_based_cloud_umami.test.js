@@ -1,6 +1,5 @@
 import UmamiClient from '../src/UmamiClient.js';
 import {expect, should} from 'chai';
-import {env} from 'node:process';
 import {isSet} from "./utils.js";
 import {
     assumeListResult,
@@ -12,16 +11,11 @@ import {
     mayBeEmpty,
     noCommandLineEnv
 } from "./testUtils.js";
+import {testEnv, skipIfNoCloudEnv} from './helpers/env.js';
 
 should();
 
-/** environment variables **/
-const {
-    UMAMI_TEST_CLOUD_API_KEY,
-    UMAMI_TEST_CLOUD_DOMAIN,
-    UMAMI_TEST_VERBOSE
-} = env;
-const verbose = UMAMI_TEST_VERBOSE === 'true';
+const verbose = testEnv.verbose;
 
 const timezone = "Europe/Paris";
 let client;
@@ -32,11 +26,9 @@ let siteData = null;
 describe("env based UmamiClient targeting umami CLOUD", function () {
     before(function () {
         noCommandLineEnv();
-        if (!isSet(UMAMI_TEST_CLOUD_API_KEY)) {
-            console.log("skip without UMAMI_TEST_CLOUD_API_KEY, you must setup your env to play success cases");
-            this.skip();
-        }
-        client = new UmamiClient({ cloudApiKey: UMAMI_TEST_CLOUD_API_KEY });
+        skipIfNoCloudEnv(this);
+
+        client = new UmamiClient({ cloudApiKey: testEnv.cloudApiKey });
         if (verbose) {
             console.info(`Test against Umami Cloud.`);
         } else {
@@ -62,13 +54,17 @@ describe("env based UmamiClient targeting umami CLOUD", function () {
 
     it("should select site by domain", async function () {
         expectTestInputOrSkip("sitesData", sitesData, this.skip.bind(this));
-        siteData = client.selectSiteByDomain(sitesData, UMAMI_TEST_CLOUD_DOMAIN);
+        // Use first site by default, or specific domain if configured
+        const domain = testEnv.cloudDomain || sitesData[0].domain;
+        siteData = client.selectSiteByDomain(sitesData, domain);
         if (!isSet(siteData) && verbose) {
             console.info(" x none");
         } else if (verbose) {
             logWebsite(siteData);
         }
         expect(siteData).to.not.be.empty;
+        // Verify it works with default (first site)
+        expect(siteData).to.be.eql(client.selectSiteByDomain(sitesData));
     });
 
     it("should get /website/{id}/stats for 1h", async function () {
