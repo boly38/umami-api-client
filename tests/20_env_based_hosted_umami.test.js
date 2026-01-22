@@ -2,7 +2,6 @@ import UmamiClient from '../src/UmamiClient.js';
 
 import {strict as assert} from 'assert';
 import {expect, should} from 'chai';
-import {env} from 'node:process';
 import {
     assumeListResult,
     assumeObjectResult,
@@ -13,19 +12,11 @@ import {
     noCommandLineEnv
 } from "./testUtils.js";
 import {isSet} from "./utils.js";
+import {testEnv, skipIfNoHostedEnv} from './helpers/env.js';
 
 should();
 
-/** environment variables **/
-const {
-    UMAMI_TEST_VERBOSE,
-    UMAMI_TEST_HOSTED_SERVER,
-    UMAMI_TEST_HOSTED_DOMAIN,
-    UMAMI_TEST_USER,
-    UMAMI_TEST_PASSWORD
-} = env;
-
-const verbose = UMAMI_TEST_VERBOSE === 'true';
+const verbose = testEnv.verbose;
 
 let client;
 let authData = null;
@@ -35,27 +26,21 @@ let siteData = null;
 describe(`env based UmamiClient targeting hosted umami instance`, function () {
     before(function () {
         noCommandLineEnv();
-        if (!isSet(UMAMI_TEST_HOSTED_SERVER)) {
-            console.log("skip without UMAMI_TEST_HOSTED_SERVER, you must setup your env to play success cases");
-            this.skip();
-        }
+        skipIfNoHostedEnv(this);
+
         client = new UmamiClient({
-            "server": UMAMI_TEST_HOSTED_SERVER,
+            "server": testEnv.hostedServer,
             "apiKey": null
         });
         if (verbose) {
-            console.info(`Test against umami server: ${UMAMI_TEST_HOSTED_SERVER}`);
+            console.info(`Test against umami server: ${testEnv.hostedServer}`);
         } else {
             infoAboutTestEnv();
         }
     });
 
     it("should login", async function () {
-        if (!isSet(UMAMI_TEST_USER) || !isSet(UMAMI_TEST_PASSWORD)) {
-            console.log("skip without UMAMI_TEST_USER, UMAMI_TEST_PASSWORD");
-            this.skip();
-        }
-        authData = await client.login(UMAMI_TEST_USER, UMAMI_TEST_PASSWORD);
+        authData = await client.login(testEnv.user, testEnv.password);
         authData.should.not.be.empty;
         authData.token.should.not.be.empty;
     });
@@ -91,9 +76,9 @@ describe(`env based UmamiClient targeting hosted umami instance`, function () {
         siteData.should.not.be.empty;
         expect(siteData).to.be.eql(client.selectSiteByDomain(sitesData)); // return first by default
         expect(siteData).to.be.eql(client.selectSiteByDomain(sitesData, '*first*'));
-        if (UMAMI_TEST_HOSTED_DOMAIN) {
-            siteData = client.selectSiteByDomain(sitesData, UMAMI_TEST_HOSTED_DOMAIN);
-            expect(siteData, `no site data for domain UMAMI_TEST_HOSTED_DOMAIN:${UMAMI_TEST_HOSTED_DOMAIN}`).to.not.be.empty;
+        if (testEnv.hostedDomain) {
+            siteData = client.selectSiteByDomain(sitesData, testEnv.hostedDomain);
+            expect(siteData, `no site data for domain UMAMI_TEST_HOSTED_DOMAIN:${testEnv.hostedDomain}`).to.not.be.empty;
         }
     });
 

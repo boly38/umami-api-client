@@ -1,20 +1,19 @@
 import UmamiClient from '../src/UmamiClient.js';
 import {expect} from 'chai';
-import {env} from 'node:process';
+import {testEnv, skipIfNoCloudEnv} from './helpers/env.js';
 
 /**
- * Tests for Pixels API (Umami v3.x)
+ * Tests for Pixels API - Cloud Mode (Umami v3.x)
  * READ-ONLY operations only
  * 
  * Environment variables required:
- * - Hosted mode: UMAMI_SERVER, UMAMI_USER, UMAMI_PASSWORD
- * - Cloud mode: UMAMI_CLOUD_API_KEY
+ * - UMAMI_TEST_CLOUD_API_KEY
  */
 
-const verbose = env.VERBOSE === 'true';
-const skipTests = env.UMAMI_TEST_PIXELS === 'false';
+const verbose = testEnv.verbose;
+const skipTests = testEnv.skipPixels;
 
-describe("Pixels API (Umami v3.x) - READ-ONLY", function () {
+describe("Pixels API (Umami v3.x) - Cloud Mode - READ-ONLY", function () {
     let client = null;
     let testPixelId = null;
 
@@ -25,24 +24,12 @@ describe("Pixels API (Umami v3.x) - READ-ONLY", function () {
             return;
         }
 
-        // Initialize client
-        const isCloudMode = env.UMAMI_CLOUD_API_KEY && env.UMAMI_CLOUD_API_KEY !== '';
-        
-        if (isCloudMode) {
-            client = new UmamiClient({cloudApiKey: env.UMAMI_CLOUD_API_KEY});
-            if (verbose) {
-                console.info('Test against Umami Cloud (Pixels API)');
-            }
-        } else {
-            const {UMAMI_SERVER, UMAMI_USER, UMAMI_PASSWORD} = env;
-            if (!UMAMI_SERVER || !UMAMI_USER || !UMAMI_PASSWORD) {
-                throw new Error('Missing required environment variables for hosted mode');
-            }
-            client = new UmamiClient({server: UMAMI_SERVER});
-            await client.login(UMAMI_USER, UMAMI_PASSWORD);
-            if (verbose) {
-                console.info(`Test against Umami Hosted (${UMAMI_SERVER}) - Pixels API`);
-            }
+        skipIfNoCloudEnv(this);
+
+        // Initialize cloud client
+        client = new UmamiClient({cloudApiKey: testEnv.cloudApiKey});
+        if (verbose) {
+            console.info('Test against Umami Cloud - Pixels API');
         }
 
         // Get first pixel ID for tests
