@@ -15,6 +15,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 📚 **Full migration guide**: [MIGRATION_V3.md](./MIGRATION_V3.md)
 
+### Added
+
+- **Links API (Umami v3.x)** - Read-only support for short URL tracking:
+  - `links(options)` - List all links (paginated)
+  - `getLink(linkId)` - Get link details
+  - `linkStats(linkId, period, options)` - Get link statistics
+  - Tests: `tests/40_links_api.test.js` (12 passing)
+  - Documentation: README.md with API methods and usage examples
+
+- **Pixels API (Umami v3.x)** - Read-only support for pixel tracking:
+  - `pixels(options)` - List all pixels (paginated)
+  - `getPixel(pixelId)` - Get pixel details
+  - `pixelStats(pixelId, period, options)` - Get pixel statistics
+  - Tests: `tests/50_pixels_api.test.js` (12 passing)
+  - Documentation: README.md with API methods and usage examples
+
+⚠️ **Note**: Links and Pixels APIs are **read-only**. Write operations (create/update/delete) are not implemented. Use Umami web UI for management.
+
 ### Changed
 
 - **API alignment**: Client version now aligns with Umami server version (v3.0.3 → Umami v3.x)
@@ -41,8 +59,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Test suite updated for Umami v3 API compatibility (11/11 tests passing)
+- Test suite updated for Umami v3 API compatibility (35 tests passing total)
 - Metric type `url` replaced with `path` in all tests and documentation
+- Tests now use opt-out pattern (`UMAMI_TEST_LINKS=false` to skip instead of opt-in)
+
+### Out of Scope
+
+The following Umami v3 features are **NOT implemented** in this client:
+- ❌ Segments API - Use Umami UI
+- ❌ Cohorts - Use Umami UI
+- ❌ Admin API - Use Umami UI
+- ❌ Write operations on Links/Pixels - Use Umami UI
 
 ### Migration
 

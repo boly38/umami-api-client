@@ -20,17 +20,19 @@ Umami [ReST API](https://umami.is/docs/api) client for Node.js.
 ## Features
 
 - ✅ **Dual mode**: Umami Cloud (API key) & Hosted (login/password)
-- ✅ **Read-only API**: Retrieve websites, stats, pageviews, events, metrics, sessions, links
+- ✅ **Read-only API**: Retrieve websites, stats, pageviews, events, metrics, sessions, links, pixels
 - ✅ **Periods**: `1h`, `24h`, `7d`, `1w`, `30d`, `1m`
 - ✅ **v3 compatible**: Works with Umami v3.0.x API
-- ✅ **Links API**: Track short URLs and redirects (read-only)
-- 🔜 **More v3 features**: Pixels, Segments read APIs (in development)
+- ✅ **Links API**: Track short URLs and redirects (read-only) - **v3.0.3+**
+- ✅ **Pixels API**: Track email opens and external sites (read-only) - **v3.0.3+**
+- ❌ **Segments & Cohorts**: Not implemented (use Umami UI)
 
 ### Current Limitations
 - ❌ No website creation/modification/deletion
 - ❌ No user/team management
 - ❌ No event tracking (send events to Umami)
-- ❌ No write operations on Links/Pixels/Segments (read-only when implemented)
+- ❌ No write operations on Links/Pixels (read-only)
+- ❌ **Segments & Cohorts APIs**: Not implemented (use Umami UI for now)
 
 ## Installation
 
@@ -133,12 +135,21 @@ await client.login('admin', 'password');
 - `websiteEvents(websiteId, period, options)` - Get events (paginated)
 - `websiteSessions(websiteId, period, options)` - Get sessions (paginated)
 
-### Links (Umami v3.x)
+### Links (Umami v3.x) ✅
 - `links(options)` - List all links (short URLs)
 - `getLink(linkId)` - Get link details
 - `linkStats(linkId, period, options)` - Get link statistics (alias for `websiteStats`)
 
-> **📝 Note**: In Umami v3, links use the websites stats endpoint. `linkStats()` is an alias for `websiteStats()` where `linkId` serves as `websiteId`.
+### Pixels (Umami v3.x) ✅
+- `pixels(options)` - List all pixels (tracking pixels)
+- `getPixel(pixelId)` - Get pixel details
+- `pixelStats(pixelId, period, options)` - Get pixel statistics (alias for `websiteStats`)
+
+### Segments & Cohorts (Umami v3.x) ❌
+> **⚠️ Not Implemented**: Segments and Cohorts APIs are not available in this client.  
+> Use the Umami web UI to manage segments and cohorts.
+
+> **📝 Note**: In Umami v3, links and pixels use the websites stats endpoint. `linkStats()` and `pixelStats()` are aliases for `websiteStats()` where the ID serves as `websiteId`.
 
 ### Periods
 Accepted values: `1h`, `24h`, `7d`, `1w`, `30d`, `1m`
@@ -167,6 +178,27 @@ console.log('Link stats:', stats);
 
 // Alternative: use websiteStats() directly (same result)
 const sameStats = await client.websiteStats(linkId, '7d', { unit: 'day' });
+```
+
+#### Pixels API
+```javascript
+import UmamiClient from 'umami-api-client';
+
+const client = new UmamiClient();
+await client.login(); // or use cloud API key
+
+// Get all pixels
+const pixelsData = await client.pixels({ page: 1, pageSize: 10 });
+console.log(`Total pixels: ${pixelsData.data.length}`);
+
+// Get specific pixel
+const pixelId = pixelsData.data[0].id;
+const pixelDetails = await client.getPixel(pixelId);
+console.log(`Pixel: ${pixelDetails.name} (${pixelDetails.slug})`);
+
+// Get pixel statistics (uses /api/websites/:pixelId/stats)
+const stats = await client.pixelStats(pixelId, '7d', { unit: 'day' });
+console.log('Pixel stats:', stats);
 ```
 
 See [tests/manual/](./tests/manual/) for more examples.
